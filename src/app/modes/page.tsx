@@ -1,10 +1,14 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useStore } from "@/store"
 import { RotateCw, ArrowLeftRight, Shuffle } from "lucide-react"
+
 
 export default function Modes() {
   const router = useRouter()
+  const places = useStore((state) => state.places)
+
 
   const modes = [
     {
@@ -31,6 +35,9 @@ export default function Modes() {
     <main className="flex flex-col min-h-screen p-6 bg-[var(--surface)]">
       {/* Header */}
       <div className="mb-8">
+        <p className="text-xs uppercase tracking-widest mb-2 text-[var(--text-muted)]">
+          {places.length} places found
+        </p>
         <h1 className="text-4xl font-semibold leading-tight mb-2 text-[var(--text-main)]">
           Pick a mode
         </h1>

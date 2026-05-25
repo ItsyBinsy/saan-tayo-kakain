@@ -7,6 +7,7 @@ type Place = {
     rating?: number
     priceLevel?: string
     businessStatus?: string
+    photos?: { name: string }[]
 }
 
 type Store = {

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Space+Grotesk:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -129,24 +130,60 @@
   }
 }
 
+html {
+  height: 100%;
+}
+
 body {
+  font-family: var(--font-body);
+  background-color: var(--surface);
+  color: var(--text-main);
   max-width: 480px;
   margin: 0 auto;
-  min-height: 100vh;
+  container-type: inline-size;
+  height: 100%;
+}
+
+/* Modes page layout — full screen on mobile, card on desktop */
+.modes-hero {
+  height: 42dvh;
+  flex-shrink: 0;
+}
+
+.modes-actions {
+  height: 58dvh;
+  flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (min-width: 600px) {
+  .modes-hero {
+    height: auto;
+    padding-top: 48px;
+    padding-bottom: 32px;
+  }
+
+  .modes-actions {
+    height: auto;
+    flex: 1;
+  }
 }
 
 :root {
-  --primary: oklch(0.45 0.2 264);
+  --primary: oklch(0.35 0.18 20);
   --primary-foreground: oklch(0.985 0 0);
-  --ring: oklch(0.45 0.2 264);
+  --ring: oklch(0.35 0.18 20);
 
-  --brand: #4F46E5;
-  --brand-light: #EEF2FF;
-  --brand-dark: #3730A3;
-  --text-main: #0D0F1A;
-  --text-muted: #6B7280;
-  --surface: #F8F9FF;
-  --border-soft: #E5E7EB;
-  --splash-bg: #0D0F1A;
-  --white: #FAFAFA;
+  --brand:        #C41E3A;
+  --brand-light:  #F5E0E4;
+  --brand-dark:   #8B1020;
+  --text-main:    #1A1208;
+  --text-muted:   #9C8060;
+  --surface:      #F5F0E8;
+  --surface-dark: #1A1208;
+  --border:       #1A1208;
+  --white:        #F5F0E8;
+  --splash-bg:    #1A1208;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body:    'Space Grotesk', sans-serif;
 }

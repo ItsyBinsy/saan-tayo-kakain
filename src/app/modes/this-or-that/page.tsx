@@ -8,6 +8,7 @@ export default function ThisOrThat() {
   const router = useRouter()
   const places = useStore((state) => state.places)
   const setWinner = useStore((state) => state.setWinner)
+  const addUsedMode = useStore((state) => state.addUsedMode)
 
   const candidates = places.slice(0, 5)
   const [remaining, setRemaining] = useState(candidates)
@@ -15,24 +16,18 @@ export default function ThisOrThat() {
   const [right, setRight] = useState(candidates[1])
   const [round, setRound] = useState(1)
 
-  const addUsedMode = useStore((state) => state.addUsedMode)
-
   useEffect(() => {
     if (candidates.length < 2) router.push("/filter")
   }, [])
 
   const handlePick = (winner: typeof candidates[0]) => {
-    const newRemaining = remaining.filter(
-      (p) => p !== left && p !== right
-    )
-
+    const newRemaining = remaining.filter((p) => p !== left && p !== right)
     if (newRemaining.length === 0) {
       setWinner(winner)
       addUsedMode("this-or-that")
       router.push("/winner")
       return
     }
-
     const nextRight = newRemaining[0]
     setRemaining(newRemaining.slice(1))
     setLeft(winner)
@@ -40,67 +35,168 @@ export default function ThisOrThat() {
     setRound(round + 1)
   }
 
-
-  if (candidates.length === 0) {
-      return (
-        <main className="flex flex-col items-center justify-center min-h-screen p-6 bg-[var(--surface)]">
-          <p className="text-[var(--text-muted)]">No places found. Go back and search again.</p>
-        </main>
-      )
-    }
-
+  if (candidates.length < 2) {
     return (
-      <main className="flex flex-col min-h-screen p-6 bg-[var(--surface)]">
-
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-semibold text-[var(--text-main)] mb-2">
-            This or That
-          </h1>
-          <p className="text-sm text-[var(--text-muted)]">
-            Round {round} of 4
-          </p>
-        </div>
-
-        {/* Cards */}
-        <div className="flex flex-col gap-4">
-
-          <button
-            onClick={() => handlePick(left)}
-            className="w-full p-6 rounded-2xl border bg-white border-[var(--border-soft)] text-left active:bg-[var(--brand-light)] transition-colors"
-          >
-            <p className="text-xs uppercase tracking-widest text-[var(--brand)] mb-2">
-              Option A
-            </p>
-            <p className="text-lg font-semibold text-[var(--text-main)]">
-              {left?.displayName.text}
-            </p>
-            <p className="text-sm text-[var(--text-muted)] mt-1">
-              {left?.formattedAddress}
-            </p>
-          </button>
-
-          <div className="text-center text-sm font-medium text-[var(--text-muted)]">
-            or
-          </div>
-
-          <button
-            onClick={() => handlePick(right)}
-            className="w-full p-6 rounded-2xl border bg-white border-[var(--border-soft)] text-left active:bg-[var(--brand-light)] transition-colors"
-          >
-            <p className="text-xs uppercase tracking-widest text-[var(--brand)] mb-2">
-              Option B
-            </p>
-            <p className="text-lg font-semibold text-[var(--text-main)]">
-              {right?.displayName.text}
-            </p>
-            <p className="text-sm text-[var(--text-muted)] mt-1">
-              {right?.formattedAddress}
-            </p>
-          </button>
-
-        </div>
-
+      <main
+        className="flex flex-col items-center justify-center"
+        style={{ background: "var(--surface-dark)", height: "100dvh" }}
+      >
+        <p style={{ color: "var(--text-muted)", fontFamily: "var(--font-body)", fontSize: "14px" }}>
+          No places found. Go back and search again.
+        </p>
       </main>
     )
   }
+
+  return (
+    <main
+      className="flex flex-col"
+      style={{ background: "var(--surface-dark)", height: "100dvh", overflow: "hidden" }}
+    >
+      {/* Dark hero header */}
+      <div
+        className="flex flex-col justify-end px-5 pb-5"
+        style={{ height: "42dvh", flexShrink: 0 }}
+      >
+        <p
+          className="uppercase tracking-widest mb-3"
+          style={{
+            fontFamily: "var(--font-body)",
+            fontSize: "11px",
+            color: "var(--brand)",
+            letterSpacing: "0.12em",
+          }}
+        >
+          Round {round} of 4
+        </p>
+        <h1
+          style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 800,
+            fontSize: "clamp(56px, 18cqw, 88px)",
+            color: "var(--white)",
+            letterSpacing: "-2px",
+            lineHeight: "0.88",
+          }}
+        >
+          This or<br />That?
+        </h1>
+      </div>
+
+      {/* Two cards side by side */}
+      <div
+        style={{
+          borderTop: "2px solid var(--border)",
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          overflow: "hidden",
+        }}
+      >
+        {/* Option A */}
+        <button
+          onClick={() => handlePick(left)}
+          className="flex flex-col text-left"
+          style={{
+            background: "var(--surface)",
+            borderRight: "1px solid var(--border)",
+            padding: "20px 16px",
+            cursor: "pointer",
+            overflow: "hidden",
+            justifyContent: "space-between",
+          }}
+        >
+          <p
+            className="uppercase tracking-widest"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "10px",
+              color: "var(--brand)",
+              letterSpacing: "0.12em",
+              flexShrink: 0,
+            }}
+          >
+            Option A
+          </p>
+          <p
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: "clamp(22px, 6.5cqw, 34px)",
+              color: "var(--text-main)",
+              lineHeight: 1.05,
+              letterSpacing: "-0.5px",
+              wordBreak: "break-word",
+              hyphens: "auto",
+            }}
+          >
+            {left?.displayName.text}
+          </p>
+        </button>
+
+        {/* Option B */}
+        <button
+          onClick={() => handlePick(right)}
+          className="flex flex-col text-left"
+          style={{
+            background: "var(--surface)",
+            padding: "20px 16px",
+            cursor: "pointer",
+            overflow: "hidden",
+            justifyContent: "space-between",
+          }}
+        >
+          <p
+            className="uppercase tracking-widest"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "10px",
+              color: "var(--brand)",
+              letterSpacing: "0.12em",
+              flexShrink: 0,
+            }}
+          >
+            Option B
+          </p>
+          <p
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: "clamp(22px, 6.5cqw, 34px)",
+              color: "var(--text-main)",
+              lineHeight: 1.05,
+              letterSpacing: "-0.5px",
+              wordBreak: "break-word",
+              hyphens: "auto",
+            }}
+          >
+            {right?.displayName.text}
+          </p>
+        </button>
+      </div>
+
+      {/* Bottom hint */}
+      <div
+        className="flex items-center justify-center"
+        style={{
+          borderTop: "2px solid var(--border)",
+          background: "var(--surface)",
+          padding: "12px",
+          flexShrink: 0,
+          paddingBottom: "calc(12px + env(safe-area-inset-bottom))",
+        }}
+      >
+        <p
+          style={{
+            fontFamily: "var(--font-body)",
+            fontSize: "12px",
+            color: "var(--text-muted)",
+          }}
+        >
+          Tap to pick · loser is eliminated
+        </p>
+      </div>
+    </main>
+  )
+}

@@ -113,6 +113,8 @@ Budget:    All · <₱100 · <₱150 · <₱200 · <₱300
 ✅ Mode tracking (usedModes — can't reuse same mode, fate is final)
 ✅ Mobile viewport fix (100dvh + dvh splits + safe-area-inset-bottom)
 ✅ Desktop layout (responsive — card view on wide screens)
+✅ E2E test suite (Playwright — 18 tests, 100% passing, covers all screens + edge cases)
+✅ Edge case fixes (long names, short names, hero overflow, card overflow)
 ⬜ Logo / mascot design
 ⬜ Dark mode support
 ⬜ Polish + back buttons
@@ -130,8 +132,10 @@ src/
 │   ├── layout.tsx                  ← Root layout
 │   ├── globals.css                 ← Global styles + CSS variables
 │   ├── api/
-│   │   └── places/
-│   │       └── route.ts            ← Server-side API proxy ← NEW
+│   │   ├── places/
+│   │   │   └── route.ts            ← Server-side API proxy + rate limiter
+│   │   └── photo/
+│   │       └── route.ts            ← Image proxy (future use)
 │   ├── filter/
 │   │   └── page.tsx                ← Filter screen
 │   ├── modes/
@@ -146,6 +150,13 @@ src/
 │       └── page.tsx                ← Winner reveal screen
 ├── store/
 │   └── index.ts                    ← Zustand global store
+e2e/                                ← Playwright E2E test suite
+├── fixtures.ts                     ← Shared setup (loadApp, goToMode, test data)
+├── filter.spec.ts                  ← Filter screen tests
+├── this-or-that.spec.ts            ← This or That tests
+├── bahala-na.spec.ts               ← Bahala Na tests
+└── winner.spec.ts                  ← Winner screen tests
+playwright.config.ts                ← Playwright config (mobile viewport, webServer)
 components/
 └── ui/                             ← shadcn components
 ```
@@ -1144,6 +1155,274 @@ return new NextResponse(response.body, {
 
 ---
 
+### 45. Playwright Test Runner — Industry-Standard E2E Testing
+```
+The difference between a script and a test suite:
+
+BAD (what I started with):
+  test-edge-cases.js   → plain node script, manual console.log
+  node test-edge-cases.js
+
+GOOD (industry approach):
+  e2e/*.spec.ts        → structured test files
+  playwright.config.ts → config file
+  npm run test:e2e     → runs all tests, structured output
+
+Why it matters:
+- Hiring managers look for test suites, not scripts
+- CI/CD pipelines (GitHub Actions, Vercel) can run `npm run test:e2e` automatically
+- Structured output shows pass/fail per test, not buried in console.log
+- Fixtures are reusable across tests (no copy-paste)
+```
+
+---
+
+### 46. @playwright/test — Test Runner Structure
+```ts
+// The correct import (test runner, not just browser automation):
+import { test, expect } from "@playwright/test"
+
+// Basic structure:
+test.describe("Feature Name", () => {
+  test("does something specific", async ({ page }) => {
+    await page.goto("/filter")
+    await expect(page.getByText("Find places →")).toBeVisible()
+  })
+})
+
+// vs the wrong way (what we started with):
+const { chromium } = require('playwright')  // bare playwright — no test runner
+// → no describe blocks, no expect assertions, no structured output
+```
+
+---
+
+### 47. Playwright Config — playwright.config.ts
+```ts
+import { defineConfig, devices } from "@playwright/test"
+
+export default defineConfig({
+  testDir: "./e2e",          // where your test files live
+  fullyParallel: false,      // run tests sequentially (safer for stateful apps)
+  retries: 0,                // don't retry failed tests
+  reporter: "list",          // output format in terminal
+
+  use: {
+    baseURL: "http://localhost:3000",  // all page.goto("/x") → localhost:3000/x
+    trace: "on-first-retry",           // record trace on failure
+  },
+
+  projects: [{
+    name: "Mobile Chrome",
+    use: {
+      ...devices["Pixel 5"],          // preset viewport + UA for Pixel 5
+      geolocation: { latitude: 14.598, longitude: 120.984 },
+      permissions: ["geolocation"],   // grant geo permission by default
+    },
+  }],
+
+  webServer: {
+    command: "npm run dev",           // start dev server before tests
+    url: "http://localhost:3000",
+    reuseExistingServer: true,        // don't restart if already running
+  },
+})
+```
+
+---
+
+### 48. Playwright Fixtures — Reusable Setup Per Test
+```ts
+// fixtures.ts — define your custom helpers here
+import { test as base } from "@playwright/test"
+
+type Fixtures = {
+  loadApp: (places: Place[]) => Promise<void>
+  goToMode: (mode: "paikutin" | "this-or-that" | "bahala-na") => Promise<void>
+}
+
+export const test = base.extend<Fixtures>({
+  // Each fixture gets injected into every test that needs it
+  loadApp: async ({ page, context }, use) => {
+    const load = async (places: Place[]) => {
+      // Mock the API + navigate through filter → modes
+      await context.route("**/api/places", route => route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ places }),
+      }))
+      await page.goto("/filter")
+      await page.getByText("Find places →").click()
+      await page.waitForURL("**/modes", { timeout: 10000 })
+    }
+    await use(load)  // "use" = hand the fixture to the test
+  },
+})
+
+// In your test file:
+import { test, expect } from "./fixtures"
+
+test("something", async ({ page, loadApp, goToMode }) => {
+  await loadApp(SHORT_PLACES)   // fixture available here
+  await goToMode("bahala-na")
+})
+
+// Why fixtures over beforeEach:
+// fixtures are lazy (only run if the test uses them)
+// fixtures compose (you can use multiple at once)
+// fixtures are typed (TypeScript knows what's available)
+```
+
+---
+
+### 49. Playwright Assertions — expect() API
+```ts
+// Visibility
+await expect(page.getByText("Find places →")).toBeVisible()
+await expect(page.locator("h1")).not.toBeEmpty()
+
+// URL
+await expect(page).toHaveURL(/\/winner/)      // regex match
+await expect(page).toHaveURL("**/modes")      // glob match
+
+// Waiting for navigation
+await page.waitForURL("**/winner", { timeout: 5000 })
+
+// Count
+const count = await page.locator("button").count()
+
+// Bounding box (layout checks)
+const box = await page.locator("main").boundingBox()
+// box = { x, y, width, height } — pixel coordinates on screen
+
+// Check overflow:
+expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 2)
+```
+
+---
+
+### 50. Route Mocking — Intercepting Network Requests in Tests
+```ts
+// Mock a specific route to return test data
+await context.route("**/api/places", (route) =>
+  route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ places: testData }),
+  })
+)
+
+// Clear the mock before setting a new one
+await context.unroute("**/api/places")
+
+// Why mock at the route level (not fetch level):
+// - Works even if the code uses any HTTP library
+// - The real server code runs but the external API is mocked
+// - Tests are isolated from real API costs and rate limits
+// - No internet required to run tests
+```
+
+---
+
+### 51. The Critical E2E Lesson — In-Memory Store + Navigation
+```
+⚠️ Most important lesson from building this test suite.
+
+Problem: Zustand store was in-memory (no localStorage persist).
+Every page.goto() = full page reload = store wiped = test fails.
+
+BAD approach (what we tried first):
+  await loadApp(SHORT_PLACES)  // store populated at /modes
+  await page.goto("/modes/bahala-na")  // ❌ full reload → store gone → redirected to /filter
+
+GOOD approach (what works):
+  await loadApp(SHORT_PLACES)  // store populated at /modes
+  await goToMode("bahala-na")  // ✅ clicks the button → Next.js client-side nav → store lives
+
+The rule:
+  page.goto()   → full page load → React state RESET → use only to start fresh
+  button.click()
+  link.click()  → client-side navigation → React state PRESERVED
+  router.push()
+
+Between game mode screens: always click in-app buttons.
+Use page.goto() only for the very first navigation or for redirect tests.
+
+Also: between game modes on winner screen, click "Try a different mode"
+(client-side) NOT page.goto("/modes") (full reload).
+```
+
+---
+
+### 52. Edge Cases Covered in This App
+```
+This or That:
+  ✅ Short names (single word like "Jco") — white space in card is intentional
+  ✅ Long names — wordBreak: "break-word" + hyphens: "auto" wraps inside card
+  ✅ Cards don't overflow viewport width — grid overflow: hidden on container
+  ✅ 4-round flow completes and reaches /winner
+  ✅ Direct URL with no state → redirects to /filter
+
+Winner:
+  ✅ Long winner name — minHeight not fixed height on hero → expands to fit
+  ✅ Short winner name — hero shrinks naturally, no awkward gap
+  ✅ No priceLevel → price detail not shown (no "undefined per person" bug)
+  ✅ All 3 modes used → "Wala nang lusot" shown, Try button hidden
+  ✅ 1 mode used → "Try a different mode" button shown
+  ✅ Direct URL with no winner state → redirects to /filter
+
+Bahala Na:
+  ✅ Auto-picks and redirects in ~1.5s
+  ✅ Already-used mode button is disabled (no re-pick on second visit)
+  ✅ Direct URL with no places → redirects to /filter
+
+Filter:
+  ✅ API returns 0 results → error shown, stays on /filter
+  ✅ API 500 error → error shown, stays on /filter
+  ✅ Successful search → navigates to /modes
+```
+
+---
+
+### 53. minHeight vs height — When to Use Which
+```css
+/* height: fixed — element is exactly this tall */
+height: 38dvh;
+/* Problem: if content is taller (long restaurant name), it CLIPS or overflows */
+
+/* minHeight: flexible floor — element is AT LEAST this tall */
+min-height: 38dvh;
+/* Benefit: short content = 38dvh, long content = grows naturally */
+/* Always prefer minHeight for hero sections that contain variable text */
+
+/* Rule: */
+/* height    → use for containers (main, grid, buttons) where you control content */
+/* minHeight → use for hero sections, text containers with unknown content length */
+```
+
+---
+
+### 54. wordBreak and hyphens — Handling Long Words in Small Containers
+```css
+/* Problem: long restaurant names overflow their card */
+/* "Army Navy Burger + Burrito - Mezza Residences" */
+
+/* Fix: */
+word-break: break-word;  /* break long words at any character */
+hyphens: auto;           /* add hyphens when breaking — more readable */
+
+/* In React inline styles: */
+style={{
+  wordBreak: "break-word",
+  hyphens: "auto",
+}}
+
+/* hyphens: auto requires lang attribute on html tag to work properly */
+/* Most browsers handle it fine without — but it's good practice */
+```
+
+---
+
 ## Common Errors and Fixes
 
 | Error | Fix |
@@ -1169,6 +1448,13 @@ return new NextResponse(response.body, {
 | `Cannot find name 'useState'` after cleanup | You removed the import but left usage — remove both the import AND usage |
 | Wheel text overflows outside slices | Truncate text to ~14 chars before passing to `data` prop |
 | Image loads twice / flickers | Don't use useState + fetch for images — use `<img src="/api/photo?...">` directly |
+| Playwright test fails with "store gone" | Never use `page.goto()` between game modes — use `button.click()` to keep in-memory store alive |
+| `page.goto("/modes/x")` redirects to `/filter` | Zustand store is in-memory; full page load wipes it. Navigate via in-app buttons only. |
+| Test can't find element after `loadApp` | Did you use `page.goto()` after `loadApp`? That resets the store. Use `goToMode()` fixture instead. |
+| `@playwright/test` not found | Run `npm install --save-dev @playwright/test --legacy-peer-deps` |
+| Long winner name clips out of hero | Change `height: "38dvh"` → `minHeight: "38dvh"` on the hero div |
+| Long place name overflows card | Add `wordBreak: "break-word"` and `hyphens: "auto"` to the text element |
+| "Tara na doon!" not showing | Both `distanceText` AND `priceText` must be null — if location exists, distance is always computed |
 
 ---
 
@@ -1197,6 +1483,13 @@ return new NextResponse(response.body, {
 21. **Truncate display text, not stored data** — wheel shows short names, winner screen shows full names from store
 22. **Always check what fields you're requesting** — if data is missing, first check the `X-Goog-FieldMask` in route.ts
 23. **When confused about an API call** — draw the flow: Browser → Our Server → External API → back. Each arrow is one network call. Minimize arrows.
+24. **Use `@playwright/test`, not bare `playwright`** — the test runner gives you `test()`, `expect()`, `describe()`, structured output, and CI compatibility. Bare playwright is just browser automation.
+25. **Never `page.goto()` between game screens in tests** — in-memory Zustand store resets on full page load. Use `button.click()` to navigate with client-side routing and keep store state alive.
+26. **Fixtures over `beforeEach`** — Playwright fixtures are lazy, typed, and composable. Write them in `fixtures.ts`, import your custom `test` from there in every spec file.
+27. **Mock the network, not the code** — use `context.route("**/api/x", ...)` to intercept HTTP calls. Tests run without internet, without real API keys, and without billing.
+28. **`height` clips, `minHeight` grows** — for hero sections with variable text (restaurant names), always use `minHeight` so long names push the section taller instead of overflowing.
+29. **`wordBreak: "break-word"` + `hyphens: "auto"`** — add these to any text container where content length is unknown. Prevents overflow, keeps cards intact.
+30. **E2E tests show up on your GitHub** — they signal to hiring managers that you write production-quality code with real coverage, not just a working demo.
 
 ---
 

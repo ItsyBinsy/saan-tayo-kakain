@@ -27,6 +27,8 @@ export default function Filter() {
     const [mealType, setMealType] = useState("All")
     const [budget, setBudget] = useState("All")
     const setPlaces = useStore((state) => state.setPlaces)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const categoryMap: Record<string, string> = {
     "All":       "restaurant or cafe or food near me",
@@ -38,39 +40,57 @@ export default function Filter() {
     }
 
     const fetchPlaces = async () => {
-        navigator.geolocation.getCurrentPosition(async (position) => {
-            const { latitude, longitude } = position.coords
+    setError(null)
+    setLoading(true)
 
-            const response = await fetch(
-            `https://places.googleapis.com/v1/places:searchText`,
-            {
-                method: "POST",
-                headers: {
-                "Content-Type": "application/json",
-                "X-Goog-Api-Key": process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY!,
-                "X-Goog-FieldMask": "places.displayName,places.location,places.formattedAddress,places.businessStatus,places.priceLevel,places.rating",
-                },
-                body: JSON.stringify({
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+        try {
+            const { latitude, longitude } = position.coords
+            const response = await fetch("/api/places", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
                 textQuery: categoryMap[mealType],
-                maxResultCount: 20,
-                locationBias: {
-                    circle: {
-                    center: {
-                        latitude,
-                        longitude,
-                    },
-                    radius: 500,
-                    },
-                },
-                }),
+                latitude,
+                longitude,
+            }),
+            })
+
+            if (!response.ok) {
+            const err = await response.json()
+            throw new Error(err.error ?? "Failed to fetch places")
             }
-            )
 
             const data = await response.json()
-            const places = data.places.slice(0, 10)
+            const places = (data.places ?? []).slice(0, 10)
+
+            if (places.length === 0) {
+            setError("Walang nahanap. Try a different filter.")
+            setLoading(false)
+            return
+            }
+
             setPlaces(places)
             router.push("/modes")
-        })
+
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Something went wrong.")
+            setLoading(false)
+        }
+        },
+        (geoError) => {
+        setLoading(false)
+        if (geoError.code === geoError.PERMISSION_DENIED) {
+            setError("Location permission denied. Please enable it in your browser settings.")
+        } else if (geoError.code === geoError.POSITION_UNAVAILABLE) {
+            setError("Could not determine your location.")
+        } else {
+            setError("Location request timed out.")
+        }
+        },
+        { timeout: 10000 }
+    )
     }
 
     return (
@@ -141,10 +161,21 @@ export default function Filter() {
             {/* Find places */}
             <button
             onClick={fetchPlaces}
-            className="w-full py-4 rounded-2xl text-sm font-medium transition-colors bg-[var(--text-main)] text-[var(--white)]"
+            disabled={loading}
+            className={`w-full py-4 rounded-2xl text-sm font-medium transition-colors ${
+                loading
+                ? "bg-[var(--border-soft)] text-[var(--text-muted)]"
+                : "bg-[var(--text-main)] text-[var(--white)]"
+            }`}
             >
-                Find places
+            {loading ? "Finding places..." : "Find places"}
             </button>
+            
+            {error && (
+            <p className="text-sm text-center mt-4" style={{ color: "#E8472A" }}>
+                {error}
+            </p>
+            )}
         </main>
     )
 }

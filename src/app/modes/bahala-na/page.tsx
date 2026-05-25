@@ -23,7 +23,7 @@ export default function BahalaNa() {
     }, 1500)
 
     return () => clearTimeout(timer)
-  }, [])
+  }, [places, router, setWinner])
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-[var(--surface)]">

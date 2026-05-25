@@ -25,7 +25,7 @@ export default function Filter() {
 
     const router = useRouter()
     const [mealType, setMealType] = useState("All")
-    const [budget, setBudget] = useState("All")
+    const [budget, setBudget] = useState("Any price")
     const setPlaces = useStore((state) => state.setPlaces)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -63,7 +63,36 @@ export default function Filter() {
             }
 
             const data = await response.json()
-            const places = (data.places ?? []).slice(0, 10)
+            const priceLevelMap: Record<string, number> = {
+            "Any price": Infinity,
+            "₱100": 1,
+            "₱200": 2,
+            "₱300": 3,
+            "₱400": 4,
+            }
+
+                const allPlaces = (data.places ?? [])
+                const maxLevel = priceLevelMap[budget]
+                const filtered = allPlaces.filter((p: any) => {
+                if (!p.priceLevel || p.priceLevel === "PRICE_LEVEL_UNSPECIFIED") return true
+                const levels = [
+                    "PRICE_LEVEL_FREE",
+                    "PRICE_LEVEL_INEXPENSIVE",
+                    "PRICE_LEVEL_MODERATE",
+                    "PRICE_LEVEL_EXPENSIVE",
+                    "PRICE_LEVEL_VERY_EXPENSIVE"
+                ]
+                const level = levels.indexOf(p.priceLevel)
+                return level <= maxLevel
+                })
+
+                if (filtered.length === 0) {
+                setError("Walang nahanap sa budget na yan. Try a wider filter.")
+                setLoading(false)
+                return
+                }
+
+                const places = filtered.slice(0, 10)
 
             if (places.length === 0) {
             setError("Walang nahanap. Try a different filter.")
@@ -142,7 +171,7 @@ export default function Filter() {
                     Budget
                 </p>
                 <div className="flex flex-wrap gap-2">
-                    {["All", "<₱100", "<₱150", "<₱200", "<₱300"].map((item) => (
+                    {["Any price", "₱100", "₱200", "₱300", "₱400"].map((item) => (
                         <button
                         key={item}
                         onClick={() => setBudget(item)}

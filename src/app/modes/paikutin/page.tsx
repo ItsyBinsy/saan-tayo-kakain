@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import { Wheel } from "react-custom-roulette"
@@ -12,6 +12,10 @@ export default function Paikutin() {
 
   const [spinning, setSpinning] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
+
+  useEffect(() => {
+    if (places.length === 0) router.push("/filter")
+  }, [])
 
   const data = places.map((place) => ({
     option: place.displayName.text

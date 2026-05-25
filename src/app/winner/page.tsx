@@ -2,10 +2,15 @@
 
 import { useStore } from "@/store"
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function Winner() {
   const router = useRouter()
   const winner = useStore((state) => state.winner)
+
+  useEffect(() => {
+    if (!winner) router.push("/filter")
+  }, [])
 
   if (!winner) {
     return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 
@@ -14,6 +14,10 @@ export default function ThisOrThat() {
   const [left, setLeft] = useState(candidates[0])
   const [right, setRight] = useState(candidates[1])
   const [round, setRound] = useState(1)
+
+  useEffect(() => {
+    if (candidates.length < 2) router.push("/filter")
+  }, [])
 
   const handlePick = (winner: typeof candidates[0]) => {
     const newRemaining = remaining.filter(

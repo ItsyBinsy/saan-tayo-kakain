@@ -15,6 +15,8 @@ export default function ThisOrThat() {
   const [right, setRight] = useState(candidates[1])
   const [round, setRound] = useState(1)
 
+  const addUsedMode = useStore((state) => state.addUsedMode)
+
   useEffect(() => {
     if (candidates.length < 2) router.push("/filter")
   }, [])
@@ -26,6 +28,7 @@ export default function ThisOrThat() {
 
     if (newRemaining.length === 0) {
       setWinner(winner)
+      addUsedMode("this-or-that")
       router.push("/winner")
       return
     }

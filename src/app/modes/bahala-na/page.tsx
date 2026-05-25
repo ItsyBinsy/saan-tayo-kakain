@@ -9,21 +9,24 @@ export default function BahalaNa() {
   const places = useStore((state) => state.places)
   const setWinner = useStore((state) => state.setWinner)
 
-  useEffect(() => {
-    if (places.length === 0) {
-      router.push("/filter")
-      return
-    }
+  const addUsedMode = useStore((state) => state.addUsedMode)
+  const usedModes = useStore((state) => state.usedModes)
 
-    const winner = Math.floor(Math.random() * places.length)
-    setWinner(places[winner])
+  useEffect(() => {
+    if (places.length === 0) { router.push("/filter"); return }
+    
+    if (!usedModes.includes("bahala-na")) {
+      const winner = Math.floor(Math.random() * places.length)
+      setWinner(places[winner])
+      addUsedMode("bahala-na")
+    }
 
     const timer = setTimeout(() => {
       router.push("/winner")
     }, 1500)
 
     return () => clearTimeout(timer)
-  }, [places, router, setWinner])
+  }, [places, router, setWinner, addUsedMode, usedModes])
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-[var(--surface)]">

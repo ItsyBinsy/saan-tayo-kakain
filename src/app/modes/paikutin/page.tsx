@@ -13,6 +13,8 @@ export default function Paikutin() {
   const [spinning, setSpinning] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
 
+  const addUsedMode = useStore((state) => state.addUsedMode)
+
   useEffect(() => {
     if (places.length === 0) router.push("/filter")
   }, [])
@@ -31,6 +33,7 @@ export default function Paikutin() {
   const handleStop = () => {
     setSpinning(false)
     setWinner(places[prizeNumber])
+    addUsedMode("paikutin")
     router.push("/winner")
   }
 

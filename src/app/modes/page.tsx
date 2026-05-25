@@ -9,6 +9,7 @@ export default function Modes() {
   const router = useRouter()
   const places = useStore((state) => state.places)
 
+  const usedModes = useStore((state) => state.usedModes)
 
   const modes = [
     {
@@ -51,8 +52,12 @@ export default function Modes() {
         {modes.map((mode) => (
           <button
             key={mode.id}
-            onClick={()=> router.push(`/modes/${mode.id}`)}
-            className="flex items-center gap-4 p-4 rounded-2xl border bg-white border-[var(--border-soft)] text-left transition-colors active:bg-[var(--brand-light)]"
+            onClick={() => !usedModes.includes(mode.id) && router.push(`/modes/${mode.id}`)}
+            className={`flex items-center gap-4 p-4 rounded-2xl border text-left transition-colors ${
+              usedModes.includes(mode.id)
+                ? "bg-[var(--border-soft)] border-[var(--border-soft)] opacity-50 cursor-not-allowed"
+                : "bg-white border-[var(--border-soft)] active:bg-[var(--brand-light)]"
+            }`}
           >
             <div className="w-12 h-12 rounded-xl flex justify-center items-center bg-[var(--brand-light)] text-[var(--brand)]" >
               {mode.icon}

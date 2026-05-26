@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
-import { Wheel } from "react-custom-roulette"
+import dynamic from "next/dynamic"
 import LoadingScreen from "@/components/LoadingScreen"
 import afterPaikutinAnim from "@/animations/after-paikutin.json"
+
+const Wheel = dynamic(() => import("react-custom-roulette").then(m => m.Wheel), { ssr: false })
 
 
 export default function Paikutin() {

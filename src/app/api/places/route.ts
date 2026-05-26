@@ -17,7 +17,12 @@ function isRateLimited(ip: string): boolean {
   const now = Date.now()
   const timestamps = (requestLog.get(ip) ?? []).filter(t => now - t < WINDOW_MS)
   if (timestamps.length >= MAX_REQUESTS) return true
-  requestLog.set(ip, [...timestamps, now])
+  if (timestamps.length === 0) {
+    requestLog.delete(ip)
+    requestLog.set(ip, [now])
+  } else {
+    requestLog.set(ip, [...timestamps, now])
+  }
   return false
 }
 
@@ -27,7 +32,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Too many requests. Try again in a minute." }, { status: 429 })
   }
 
-  const body = await req.json()
+  let body
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
+  }
+
   const { textQuery, latitude, longitude } = body
 
   if (!ALLOWED_CATEGORIES.has(textQuery)) {
@@ -40,26 +51,36 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Coordinates out of range" }, { status: 400 })
   }
 
-  const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
-      "X-Goog-FieldMask": "places.displayName,places.location,places.formattedAddress,places.businessStatus,places.priceLevel,places.rating,places.regularOpeningHours",
-    },
-    body: JSON.stringify({
-      textQuery,
-      maxResultCount: 20,
-      locationBias: {
-        circle: { center: { latitude, longitude }, radius: 500 },
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 8000)
+
+  try {
+    const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
+        "X-Goog-FieldMask": "places.displayName,places.location,places.formattedAddress,places.businessStatus,places.priceLevel,places.rating,places.regularOpeningHours",
       },
-    }),
-  })
+      body: JSON.stringify({
+        textQuery,
+        maxResultCount: 20,
+        locationBias: {
+          circle: { center: { latitude, longitude }, radius: 500 },
+        },
+      }),
+    })
 
-  if (!response.ok) {
-    return NextResponse.json({ error: "Places API error" }, { status: 502 })
+    if (!response.ok) {
+      return NextResponse.json({ error: "Places API error" }, { status: 502 })
+    }
+
+    const data = await response.json()
+    return NextResponse.json(data)
+  } catch {
+    return NextResponse.json({ error: "Request timed out or failed" }, { status: 504 })
+  } finally {
+    clearTimeout(timeout)
   }
-
-  const data = await response.json()
-  return NextResponse.json(data)
 }

@@ -10,6 +10,9 @@ export default function Home() {
 
   return (
     <main
+      role="button"
+      tabIndex={0}
+      aria-label="Tap to start"
       className="flex flex-col items-center justify-center relative cursor-pointer"
       style={{
         background: "var(--surface)",
@@ -17,6 +20,7 @@ export default function Home() {
         overflow: "hidden",
       }}
       onClick={() => router.push("/filter")}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") router.push("/filter") }}
     >
       <motion.div
         className="flex flex-col items-center gap-4 text-center px-6"

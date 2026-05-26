@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-type Place = {
+export type Place = {
     displayName: { text: string }
     formattedAddress: string
     location: { latitude: number; longitude: number }

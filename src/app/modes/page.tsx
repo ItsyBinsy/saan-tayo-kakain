@@ -81,6 +81,8 @@ export default function Modes() {
             <button
               key={mode.id}
               onClick={() => !isUsed && router.push(`/modes/${mode.id}`)}
+              aria-disabled={isUsed}
+              aria-label={isUsed ? `${mode.name} — already used` : mode.name}
               className="w-full flex items-center justify-between px-6"
               style={{
                 borderBottom: index < 2 ? "1.5px solid var(--border)" : "none",

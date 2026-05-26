@@ -4,7 +4,7 @@ import { useState } from "react"
 import { MapPin } from "lucide-react"
 import PageTransition from "@/components/PageTransition"
 import { useRouter } from "next/navigation"
-import { useStore } from "@/store"
+import { useStore, type Place } from "@/store"
 import LoadingScreen from "@/components/LoadingScreen"
 import findingPlacesAnim from "@/animations/finding-places.json"
 
@@ -70,7 +70,7 @@ export default function Filter() {
           const data = await response.json()
           const allPlaces = (data.places ?? [])
           const maxLevel = priceLevelMap[budget]
-          const filtered = allPlaces.filter((p: any) => {
+          const filtered = allPlaces.filter((p: Place) => {
             if (p.businessStatus === "CLOSED_PERMANENTLY") return false
             if (!p.priceLevel || p.priceLevel === "PRICE_LEVEL_UNSPECIFIED") return true
             const levels = [
@@ -101,8 +101,10 @@ export default function Filter() {
           setLocationDenied(true)
         } else if (geoError.code === geoError.POSITION_UNAVAILABLE) {
           setError("Could not determine your location.")
+        } else if (geoError.code === geoError.TIMEOUT) {
+          setError("Location request timed out. Please try again.")
         } else {
-          setError("Location request timed out.")
+          setError("Could not get your location. Please try again.")
         }
       },
       { timeout: 10000 }
@@ -119,6 +121,7 @@ export default function Filter() {
 
     return (
       <main
+        role="alert"
         className="flex flex-col"
         style={{ background: "var(--surface)", height: "100dvh", overflow: "hidden" }}
       >
@@ -254,6 +257,8 @@ export default function Filter() {
             <button
               key={item.label}
               onClick={() => setMealType(item.label)}
+              aria-label={`Select meal type: ${item.label}`}
+              aria-pressed={isSelected}
               className="flex flex-col justify-between text-left"
               style={{
                 padding: "14px 16px",

@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     description: "Tabi. Ako na pipili. No more arguments about where to eat.",
   },
   metadataBase: new URL("https://www.saantayokakain.today"),
+  alternates: { canonical: "https://www.saantayokakain.today" },
   appleWebApp: {
     title: "STK",
     capable: true,
@@ -40,7 +41,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en-PH">
-      <body>{children}</body>
+      <body>
+        {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "Saan Tayo Kakain",
+              "url": "https://www.saantayokakain.today",
+              "description": "Tabi. Ako na pipili. No more arguments about where to eat.",
+              "applicationCategory": "LifestyleApplication",
+              "operatingSystem": "Any",
+            }),
+          }}
+        />
+      </body>
     </html>
   );
 }

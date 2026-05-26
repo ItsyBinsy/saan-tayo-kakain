@@ -35,7 +35,7 @@ export default function Winner() {
 
   useEffect(() => {
     if (!winner) router.push("/filter")
-  }, [])
+  }, [winner, router])
 
   if (!winner) return null
 
@@ -83,18 +83,18 @@ export default function Winner() {
   const detailRows: { icon: React.ReactNode; label: string; sub?: string; accent?: boolean }[] = []
 
   if (distanceText) {
-    detailRows.push({ icon: <PersonStanding size={15} strokeWidth={2} />, label: distanceText })
+    detailRows.push({ icon: <PersonStanding size={15} strokeWidth={2} aria-hidden />, label: distanceText })
   }
   if (openStatus) {
     detailRows.push({
-      icon: <Clock size={15} strokeWidth={2} />,
+      icon: <Clock size={15} strokeWidth={2} aria-hidden />,
       label: openStatus,
       sub: todayHours ?? undefined,
       accent: !openNow,
     })
   }
   if (priceText) {
-    detailRows.push({ icon: <Banknote size={15} strokeWidth={2} />, label: priceText })
+    detailRows.push({ icon: <Banknote size={15} strokeWidth={2} aria-hidden />, label: priceText })
   }
 
   return (
@@ -139,7 +139,7 @@ export default function Winner() {
           {winner.displayName.text}
         </h1>
         <div className="flex items-center gap-1 mt-3">
-          <MapPin size={11} strokeWidth={2.5} color="var(--text-muted)" />
+          <MapPin size={11} strokeWidth={2.5} color="var(--text-muted)" aria-hidden />
           <p
             style={{
               fontFamily: "var(--font-body)",

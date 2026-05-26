@@ -43,7 +43,7 @@ export const useStore = create<Store>()(
         }),
         {
             name: "stk-store",
-            partialize: (state) => ({ usedModes: state.usedModes }),
+            partialize: (state) => ({ usedModes: state.usedModes, places: state.places }),
         }
     )
 )

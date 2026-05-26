@@ -125,7 +125,7 @@ export default function Winner() {
             letterSpacing: "0.12em",
           }}
         >
-          {allModesUsed ? "Wala nang lusot." : "It's decided."}
+          {allModesUsed ? "Universe has spoken." : "It's decided."}
         </p>
         <h1
           style={{
@@ -281,7 +281,7 @@ export default function Winner() {
               fontStyle: "italic",
             }}
           >
-            Nagamit mo na lahat ng modes. Sige na, tara na doon.
+            You've used all modes. Sige na, tara na doon.
           </p>
         )}
 

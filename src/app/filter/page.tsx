@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
-import { MapPin } from "lucide-react"
 import LoadingScreen from "@/components/LoadingScreen"
 import findingPlacesAnim from "@/animations/finding-places.json"
 
@@ -66,6 +65,7 @@ export default function Filter() {
           const allPlaces = (data.places ?? [])
           const maxLevel = priceLevelMap[budget]
           const filtered = allPlaces.filter((p: any) => {
+            if (p.businessStatus === "CLOSED_PERMANENTLY") return false
             if (!p.priceLevel || p.priceLevel === "PRICE_LEVEL_UNSPECIFIED") return true
             const levels = [
               "PRICE_LEVEL_FREE",
@@ -124,30 +124,14 @@ export default function Filter() {
     >
       {/* Header */}
       <div
-        className="px-5 pt-5 pb-4"
-        style={{ borderBottom: "2px solid var(--border)", flexShrink: 0 }}
+        className="px-5 pb-4"
+        style={{ borderBottom: "2px solid var(--border)", flexShrink: 0, paddingTop: "calc(20px + env(safe-area-inset-top))" }}
       >
-        <div
-          className="flex items-center gap-1 mb-3"
-          style={{ color: "var(--brand)", fontFamily: "var(--font-body)" }}
-        >
-          <MapPin size={10} strokeWidth={2.5} />
-          <span
-            style={{
-              fontSize: "10px",
-              fontWeight: 600,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-            }}
-          >
-            España · Manila
-          </span>
-        </div>
         <h1
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
-            fontSize: "clamp(44px, 14cqw, 64px)",
+            fontSize: "clamp(52px, 16cqw, 76px)",
             letterSpacing: "-1px",
             lineHeight: "0.88",
             color: "var(--text-main)",

@@ -8,6 +8,7 @@ type Place = {
     priceLevel?: string
     businessStatus?: string
     photos?: { name: string }[]
+    regularOpeningHours?: { openNow?: boolean; weekdayDescriptions?: string[] }
 }
 
 type Store = {

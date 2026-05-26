@@ -24,7 +24,7 @@ export default function Modes() {
       }}
     >
       {/* Context — top */}
-      <div className="modes-hero flex flex-col justify-end pb-6">
+      <div className="modes-hero flex flex-col justify-end pb-6" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <p
           className="uppercase tracking-widest mb-2 px-5"
           style={{
@@ -70,6 +70,7 @@ export default function Modes() {
           borderTop: "2px solid var(--border)",
           display: "flex",
           flexDirection: "column",
+          paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
         {modes.map((mode, index) => {

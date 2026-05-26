@@ -80,22 +80,25 @@ export default function Winner() {
   const addressParts = winner.formattedAddress.split(",")
   const shortAddress = addressParts.slice(0, 2).join(" ·").trim()
 
-  const detailRows: { icon: React.ReactNode; label: string; sub?: string; accent?: boolean }[] = []
-
-  if (distanceText) {
-    detailRows.push({ icon: <PersonStanding size={15} strokeWidth={2} aria-hidden />, label: distanceText })
-  }
-  if (openStatus) {
-    detailRows.push({
+  const detailRows: { icon: React.ReactNode; label: string; sub?: string; accent?: boolean; muted?: boolean }[] = [
+    {
+      icon: <PersonStanding size={15} strokeWidth={2} aria-hidden />,
+      label: distanceText ?? "Distance not available",
+      muted: !distanceText,
+    },
+    {
       icon: <Clock size={15} strokeWidth={2} aria-hidden />,
-      label: openStatus,
+      label: openStatus ?? "Hours not available",
       sub: todayHours ?? undefined,
-      accent: !openNow,
-    })
-  }
-  if (priceText) {
-    detailRows.push({ icon: <Banknote size={15} strokeWidth={2} aria-hidden />, label: priceText })
-  }
+      accent: !!openStatus && !openNow,
+      muted: !openStatus,
+    },
+    {
+      icon: <Banknote size={15} strokeWidth={2} aria-hidden />,
+      label: priceText ?? "Price not available",
+      muted: !priceText,
+    },
+  ]
 
   return (
     <PageTransition>
@@ -164,11 +167,6 @@ export default function Winner() {
           gap: "0px",
         }}
       >
-        {detailRows.length === 0 && (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)" }}>
-            Tara na doon!
-          </p>
-        )}
         {detailRows.map((row, i) => (
           <motion.div
             key={i}
@@ -196,8 +194,9 @@ export default function Winner() {
                   fontFamily: "var(--font-body)",
                   fontSize: "13px",
                   fontWeight: 600,
-                  color: row.accent ? "var(--brand)" : "var(--text-main)",
+                  color: row.accent ? "var(--brand)" : row.muted ? "var(--text-muted)" : "var(--text-main)",
                   lineHeight: 1.3,
+                  fontStyle: row.muted ? "italic" : "normal",
                 }}
               >
                 {row.label}

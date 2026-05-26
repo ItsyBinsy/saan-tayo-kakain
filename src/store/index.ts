@@ -5,10 +5,8 @@ export type Place = {
     displayName: { text: string }
     formattedAddress: string
     location: { latitude: number; longitude: number }
-    rating?: number
     priceLevel?: string
     businessStatus?: string
-    photos?: { name: string }[]
     regularOpeningHours?: { openNow?: boolean; weekdayDescriptions?: string[] }
 }
 

@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
-        "X-Goog-FieldMask": "places.displayName,places.location,places.formattedAddress,places.businessStatus,places.priceLevel,places.rating,places.regularOpeningHours",
+        "X-Goog-FieldMask": "places.displayName,places.location,places.formattedAddress,places.businessStatus,places.priceLevel,places.regularOpeningHours",
       },
       body: JSON.stringify({
         textQuery,

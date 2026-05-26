@@ -107,7 +107,27 @@ export default function Filter() {
   }
 
   if (locationDenied) {
-    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+    const ua = navigator.userAgent
+    const isIOS = /iPhone|iPad|iPod/.test(ua)
+    const isChromeiOS = isIOS && /CriOS/.test(ua)
+    const isSamsungBrowser = /SamsungBrowser/.test(ua)
+
+    const steps = isChromeiOS
+      ? ["Buksan ang Settings ng iPhone", "Scroll down, hanapin ang Chrome", "Tap Location", "Piliin ang 'While Using the App'", "Bumalik dito at subukan ulit"]
+      : isIOS
+      ? ["Buksan ang Settings ng iPhone", "Scroll down, hanapin ang Safari", "Tap Location", "Piliin ang 'While Using the App'", "Bumalik dito at subukan ulit"]
+      : isSamsungBrowser
+      ? ["Tap the lock icon sa address bar", "Tap Permissions", "I-allow ang Location", "I-refresh ang page"]
+      : ["Tap the lock icon sa address bar ng browser", "Tap Site Settings o Permissions", "I-allow ang Location", "I-refresh ang page"]
+
+    const label = isChromeiOS
+      ? "iPhone — Chrome"
+      : isIOS
+      ? "iPhone — Safari"
+      : isSamsungBrowser
+      ? "Android — Samsung Browser"
+      : "Android — Chrome"
+
     return (
       <main
         className="flex flex-col items-center justify-center px-6 text-center gap-6"
@@ -127,21 +147,13 @@ export default function Filter() {
           style={{ background: "var(--surface-dark)", borderRadius: "8px", padding: "16px 20px" }}
         >
           <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-            {isIOS ? "Para sa iPhone" : "Para sa Android"}
+            {label}
           </p>
-          {isIOS ? (
-            <ol className="flex flex-col gap-2" style={{ paddingLeft: "16px" }}>
-              {["Buksan ang Settings", "Scroll down, hanapin ang Safari", "Tap Location", "Piliin ang 'While Using the App' o 'Ask'", "Bumalik dito at subukan ulit"].map((step, i) => (
-                <li key={i} style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.4 }}>{step}</li>
-              ))}
-            </ol>
-          ) : (
-            <ol className="flex flex-col gap-2" style={{ paddingLeft: "16px" }}>
-              {["I-tap ang lock icon sa address bar ng browser", "Tap Permissions", "I-allow ang Location", "I-refresh ang page"].map((step, i) => (
-                <li key={i} style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.4 }}>{step}</li>
-              ))}
-            </ol>
-          )}
+          <ol className="flex flex-col gap-2" style={{ paddingLeft: "16px" }}>
+            {steps.map((step, i) => (
+              <li key={i} style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.4 }}>{step}</li>
+            ))}
+          </ol>
         </div>
         <button
           onClick={() => setLocationDenied(false)}

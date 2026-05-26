@@ -32,7 +32,6 @@ export default function Filter() {
     "₱100": 1,
     "₱200": 2,
     "₱300": 3,
-    "₱400": 4,
   }
 
   const mealTypes = [
@@ -301,7 +300,17 @@ export default function Filter() {
           flexShrink: 0,
         }}
       >
-        {["Any", "₱100", "₱200", "₱300", "₱400"].map((item) => {
+        <span style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 800,
+          fontSize: "15px",
+          color: "var(--text-main)",
+          marginRight: "4px",
+          flexShrink: 0,
+        }}>
+          Budget
+        </span>
+        {["Any", "₱100", "₱200", "₱300"].map((item) => {
           const isSelected = budget === item
           return (
             <button

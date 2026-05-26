@@ -45,11 +45,11 @@ export default function Filter() {
 
   const fetchPlaces = async () => {
     setError(null)
-    setLoading(true)
     resetModes()
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        setLoading(true)
         try {
           const { latitude, longitude } = position.coords
           const response = await fetch("/api/places", {
@@ -130,38 +130,73 @@ export default function Filter() {
 
     return (
       <main
-        className="flex flex-col items-center justify-center px-6 text-center gap-6"
-        style={{ background: "var(--surface)", height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
+        className="flex flex-col"
+        style={{ background: "var(--surface)", height: "100dvh", overflow: "hidden" }}
       >
-        <MapPin size={48} strokeWidth={1.5} color="var(--brand)" />
-        <div className="flex flex-col gap-2">
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "clamp(28px, 8vw, 40px)", color: "var(--text-main)", letterSpacing: "-0.5px", lineHeight: 1 }}>
-            Kailangan ng location mo
-          </h2>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.5 }}>
-            Para mahanap namin ang mga kainan malapit sa iyo, i-allow mo lang ang location.
-          </p>
-        </div>
+        {/* Dark hero */}
         <div
-          className="w-full flex flex-col gap-3 text-left"
-          style={{ background: "var(--surface-dark)", borderRadius: "8px", padding: "16px 20px" }}
+          className="flex flex-col justify-end px-5 pb-6"
+          style={{
+            background: "var(--surface-dark)",
+            minHeight: "38dvh",
+            flexShrink: 0,
+            paddingTop: "calc(32px + env(safe-area-inset-top))",
+          }}
         >
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-            {label}
+          <div className="flex items-center gap-2 mb-3">
+            <MapPin size={14} strokeWidth={2.5} color="var(--brand)" />
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+              {label}
+            </p>
+          </div>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "clamp(36px, 12vw, 56px)", color: "var(--white)", letterSpacing: "-1px", lineHeight: 0.9 }}>
+            I-allow mo<br />ang location
+          </h2>
+          <p className="mt-3" style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.5 }}>
+            Para mahanap namin ang mga kainan malapit sa iyo.
           </p>
-          <ol className="flex flex-col gap-2" style={{ paddingLeft: "16px" }}>
-            {steps.map((step, i) => (
-              <li key={i} style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.4 }}>{step}</li>
-            ))}
-          </ol>
         </div>
+
+        {/* Steps */}
+        <div className="flex flex-col flex-1 px-5 py-5" style={{ gap: "0px", overflowY: "auto" }}>
+          {steps.map((step, i) => (
+            <div
+              key={i}
+              className="flex items-start gap-4"
+              style={{
+                paddingBottom: i < steps.length - 1 ? "16px" : 0,
+                borderBottom: i < steps.length - 1 ? "1px solid var(--border)" : "none",
+                paddingTop: i > 0 ? "16px" : 0,
+              }}
+            >
+              <span
+                className="flex items-center justify-center"
+                style={{
+                  width: "24px", height: "24px", borderRadius: "50%",
+                  background: "var(--brand)", flexShrink: 0,
+                  fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
+                  fontSize: "13px", color: "var(--white)",
+                }}
+              >
+                {i + 1}
+              </span>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "var(--text-main)", lineHeight: 1.4, paddingTop: "3px" }}>
+                {step}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
         <button
           onClick={() => setLocationDenied(false)}
           style={{
             background: "var(--text-main)", color: "var(--white)",
             fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
             fontSize: "clamp(18px, 5vw, 22px)", letterSpacing: "0.5px",
-            padding: "14px 32px", border: "none", borderRadius: "4px", cursor: "pointer",
+            padding: "16px", border: "none", borderTop: "2px solid var(--border)",
+            width: "100%", flexShrink: 0, cursor: "pointer",
+            paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
           }}
         >
           Subukan ulit

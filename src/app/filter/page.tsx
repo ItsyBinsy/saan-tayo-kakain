@@ -11,6 +11,7 @@ export default function Filter() {
   const [mealType, setMealType] = useState("All")
   const [budget, setBudget] = useState("Any")
   const setPlaces = useStore((state) => state.setPlaces)
+  const resetModes = useStore((state) => state.resetModes)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -43,6 +44,7 @@ export default function Filter() {
   const fetchPlaces = async () => {
     setError(null)
     setLoading(true)
+    resetModes()
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {

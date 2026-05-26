@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 type Place = {
     displayName: { text: string }
@@ -25,18 +26,26 @@ type Store = {
     resetModes: () => void
 }
 
-export const useStore = create<Store>((set) => ({
-    places: [],
-    mealType: "All",
-    budget: "All",
-    winner: null,
-    usedModes: [],
-    setPlaces: (places) => set({ places }),
-    setMealType: (mealType) => set({ mealType }),
-    setBudget: (budget) => set({ budget }),
-    setWinner: (winner) => set({ winner }),
-    addUsedMode: (mode) => set((state) => ({
-        usedModes: [...state.usedModes, mode]
-    })),
-    resetModes: () => set({ usedModes: [], winner: null }),
-}))
+export const useStore = create<Store>()(
+    persist(
+        (set) => ({
+            places: [],
+            mealType: "All",
+            budget: "All",
+            winner: null,
+            usedModes: [],
+            setPlaces: (places) => set({ places }),
+            setMealType: (mealType) => set({ mealType }),
+            setBudget: (budget) => set({ budget }),
+            setWinner: (winner) => set({ winner }),
+            addUsedMode: (mode) => set((state) => ({
+                usedModes: [...state.usedModes, mode]
+            })),
+            resetModes: () => set({ usedModes: [], winner: null }),
+        }),
+        {
+            name: "stk-store",
+            partialize: (state) => ({ usedModes: state.usedModes }),
+        }
+    )
+)

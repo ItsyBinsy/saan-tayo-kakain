@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     description: "Tabi. Ako na pipili. No more arguments about where to eat.",
   },
   metadataBase: new URL("https://www.saantayokakain.today"),
+  verification: { google: "ZSzMwTbVi_m2NVys9odQZD82xNgzvKAVzPPatyKHVYQ" },
   alternates: { canonical: "https://www.saantayokakain.today" },
   appleWebApp: {
     title: "STK",

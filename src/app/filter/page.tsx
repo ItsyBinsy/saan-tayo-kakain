@@ -110,26 +110,12 @@ export default function Filter() {
   }
 
   if (locationDenied) {
-    const ua = navigator.userAgent
-    const isIOS = /iPhone|iPad|iPod/.test(ua)
-    const isChromeiOS = isIOS && /CriOS/.test(ua)
-    const isSamsungBrowser = /SamsungBrowser/.test(ua)
-
-    const steps = isChromeiOS
-      ? ["Buksan ang Settings ng iPhone", "Scroll down, hanapin ang Chrome", "Tap Location", "Piliin ang 'While Using the App'", "Bumalik dito at subukan ulit"]
-      : isIOS
-      ? ["Buksan ang Settings ng iPhone", "Scroll down, hanapin ang Safari", "Tap Location", "Piliin ang 'While Using the App'", "Bumalik dito at subukan ulit"]
-      : isSamsungBrowser
-      ? ["Tap the lock icon sa address bar", "Tap Permissions", "I-allow ang Location", "I-refresh ang page"]
-      : ["Tap the lock icon sa address bar ng browser", "Tap Site Settings o Permissions", "I-allow ang Location", "I-refresh ang page"]
-
-    const label = isChromeiOS
-      ? "iPhone — Chrome"
-      : isIOS
-      ? "iPhone — Safari"
-      : isSamsungBrowser
-      ? "Android — Samsung Browser"
-      : "Android — Chrome"
+    const steps = [
+      "Check your browser's address bar for a permissions or settings icon",
+      "Or go to your phone's Settings app and find your browser",
+      "Allow location access for this site",
+      "Tap Try again below",
+    ]
 
     return (
       <main
@@ -149,14 +135,14 @@ export default function Filter() {
           <div className="flex items-center gap-2 mb-3">
             <MapPin size={14} strokeWidth={2.5} color="var(--brand)" />
             <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
-              {label}
+              Location Access
             </p>
           </div>
           <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "clamp(36px, 12vw, 56px)", color: "var(--white)", letterSpacing: "-1px", lineHeight: 0.9 }}>
-            I-allow mo<br />ang location
+            Location<br />access needed
           </h2>
           <p className="mt-3" style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.5 }}>
-            Para mahanap namin ang mga kainan malapit sa iyo.
+            We need your location to find places near you.
           </p>
         </div>
 
@@ -205,7 +191,7 @@ export default function Filter() {
             paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
           }}
         >
-          Subukan ulit
+          Try again
         </button>
       </main>
     )

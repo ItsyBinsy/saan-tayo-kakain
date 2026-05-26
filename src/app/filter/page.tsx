@@ -46,6 +46,7 @@ export default function Filter() {
 
   const fetchPlaces = async () => {
     setError(null)
+    setLocationDenied(false)
     resetModes()
 
     navigator.geolocation.getCurrentPosition(
@@ -87,6 +88,7 @@ export default function Filter() {
             return
           }
           setPlaces(filtered.slice(0, 10))
+          setLocationDenied(false)
           router.push("/modes")
         } catch (e) {
           setError(e instanceof Error ? e.message : "Something went wrong.")
@@ -190,7 +192,7 @@ export default function Filter() {
 
         {/* CTA */}
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => fetchPlaces()}
           style={{
             background: "var(--text-main)", color: "var(--white)",
             fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,

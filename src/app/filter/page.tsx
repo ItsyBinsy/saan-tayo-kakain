@@ -189,7 +189,7 @@ export default function Filter() {
 
         {/* CTA */}
         <button
-          onClick={() => setLocationDenied(false)}
+          onClick={() => { setLocationDenied(false); fetchPlaces() }}
           style={{
             background: "var(--text-main)", color: "var(--white)",
             fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,

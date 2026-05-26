@@ -3,7 +3,12 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Saan Tayo Kakain",
-  description: "Ako na bahala kung saan ka kakain.",
+  description: "Tabi. Ako na.",
+  appleWebApp: {
+    title: "STK",
+    capable: true,
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export const viewport: Viewport = {

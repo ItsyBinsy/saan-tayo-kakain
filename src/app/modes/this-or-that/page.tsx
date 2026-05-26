@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
+import LoadingScreen from "@/components/LoadingScreen"
+import afterThisOrThatAnim from "@/animations/after-this-or-that.json"
 
 export default function ThisOrThat() {
   const router = useRouter()
@@ -15,6 +17,7 @@ export default function ThisOrThat() {
   const [left, setLeft] = useState(candidates[0])
   const [right, setRight] = useState(candidates[1])
   const [round, setRound] = useState(1)
+  const [showLoading, setShowLoading] = useState(false)
 
   useEffect(() => {
     if (candidates.length < 2) router.push("/filter")
@@ -25,7 +28,8 @@ export default function ThisOrThat() {
     if (newRemaining.length === 0) {
       setWinner(winner)
       addUsedMode("this-or-that")
-      router.push("/winner")
+      setShowLoading(true)
+      setTimeout(() => router.push("/winner"), 6000)
       return
     }
     const nextRight = newRemaining[0]
@@ -33,6 +37,17 @@ export default function ThisOrThat() {
     setLeft(winner)
     setRight(nextRight)
     setRound(round + 1)
+  }
+
+  if (showLoading) {
+    return (
+      <LoadingScreen
+        animationData={afterThisOrThatAnim}
+        message="The decision has been made."
+        sub="Tara na bago ka pa magbago ng isip."
+        indicator="dots"
+      />
+    )
   }
 
   if (candidates.length < 2) {

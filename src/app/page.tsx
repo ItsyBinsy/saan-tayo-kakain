@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+import Lottie from "lottie-react"
+import splashAnim from "@/animations/splash.json"
 
 export default function Home() {
   const router = useRouter()
@@ -10,7 +12,7 @@ export default function Home() {
     <main
       className="flex flex-col items-center justify-center relative cursor-pointer"
       style={{
-        background: "var(--surface-dark)",
+        background: "var(--surface)",
         minHeight: "100dvh",
         overflow: "hidden",
       }}
@@ -23,10 +25,13 @@ export default function Home() {
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center"
-          style={{ background: "var(--brand)" }}
+          className="w-52 h-52 rounded-full flex items-center justify-center"
         >
-          <span className="text-3xl">🍴</span>
+          <Lottie
+            animationData={splashAnim}
+            loop
+            style={{ width: "clamp(120px, 38vw, 192px)", height: "clamp(120px, 38vw, 192px)", marginBottom: -58 }}
+          />
         </div>
 
         <div>
@@ -35,7 +40,7 @@ export default function Home() {
             style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 800,
-              color: "var(--white)",
+              color: "var(--text-main)",
               letterSpacing: "-1px",
               lineHeight: "0.88",
               fontSize: "clamp(72px, 22cqw, 110px)",

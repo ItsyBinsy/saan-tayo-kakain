@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import { Wheel } from "react-custom-roulette"
+import LoadingScreen from "@/components/LoadingScreen"
+import afterPaikutinAnim from "@/animations/after-paikutin.json"
 
 
 export default function Paikutin() {
@@ -14,6 +16,7 @@ export default function Paikutin() {
 
   const [spinning, setSpinning] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
+  const [showLoading, setShowLoading] = useState(false)
 
   useEffect(() => {
     if (places.length === 0) router.push("/filter")
@@ -37,7 +40,19 @@ export default function Paikutin() {
     setSpinning(false)
     setWinner(places[prizeNumber])
     addUsedMode("paikutin")
-    router.push("/winner")
+    setShowLoading(true)
+    setTimeout(() => router.push("/winner"), 6000)
+  }
+
+  if (showLoading) {
+    return (
+      <LoadingScreen
+        animationData={afterPaikutinAnim}
+        message="And the winner is..."
+        sub="Wag sana itong ayaw mo."
+        indicator="bar"
+      />
+    )
   }
 
   if (places.length === 0) {

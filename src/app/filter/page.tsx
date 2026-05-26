@@ -4,6 +4,8 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import { MapPin } from "lucide-react"
+import LoadingScreen from "@/components/LoadingScreen"
+import findingPlacesAnim from "@/animations/finding-places.json"
 
 export default function Filter() {
   const router = useRouter()
@@ -97,6 +99,17 @@ export default function Filter() {
         }
       },
       { timeout: 10000 }
+    )
+  }
+
+  if (loading) {
+    return (
+      <LoadingScreen
+        animationData={findingPlacesAnim}
+        message="Looking for places near you..."
+        sub="Puro kasi kayo Kahit Saan."
+        indicator="bar"
+      />
     )
   }
 

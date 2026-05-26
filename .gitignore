@@ -26,6 +26,9 @@
 .DS_Store
 *.pem
 
+# personal notes
+saan-tayo-kakain-notes*
+
 # debug
 npm-debug.log*
 yarn-debug.log*

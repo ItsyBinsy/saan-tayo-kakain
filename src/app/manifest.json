@@ -1,6 +1,13 @@
 {
   "name": "Saan Tayo Kakain",
   "short_name": "STK",
+  "description": "Tabi. Ako na pipili. No more arguments about where to eat.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#a03837",
+  "background_color": "#1a1208",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -14,8 +21,5 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "theme_color": "#a03837",
-  "background_color": "#a03837",
-  "display": "standalone"
+  ]
 }

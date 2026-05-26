@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
+import PageTransition from "@/components/PageTransition"
 
 export default function Modes() {
   const router = useRouter()
@@ -15,13 +16,14 @@ export default function Modes() {
   ]
 
   return (
-    <main
-      className="flex flex-col"
-      style={{
-        background: "var(--surface-dark)",
-        height: "100dvh",
-        overflow: "hidden"
-      }}
+    <PageTransition>
+      <main
+        className="flex flex-col"
+        style={{
+          background: "var(--surface-dark)",
+          height: "100dvh",
+          overflow: "hidden"
+        }}
     >
       {/* Context — top */}
       <div className="modes-hero flex flex-col justify-end pb-6" style={{ paddingTop: "env(safe-area-inset-top)" }}>
@@ -129,6 +131,7 @@ export default function Modes() {
           )
         })}
       </div>
-    </main>
+      </main>
+    </PageTransition>
   )
 }

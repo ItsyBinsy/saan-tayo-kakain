@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { MapPin } from "lucide-react"
+import PageTransition from "@/components/PageTransition"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import LoadingScreen from "@/components/LoadingScreen"
@@ -189,7 +190,7 @@ export default function Filter() {
 
         {/* CTA */}
         <button
-          onClick={() => { setLocationDenied(false); fetchPlaces() }}
+          onClick={() => window.location.reload()}
           style={{
             background: "var(--text-main)", color: "var(--white)",
             fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
@@ -217,7 +218,8 @@ export default function Filter() {
   }
 
   return (
-    <main
+    <PageTransition>
+      <main
       className="flex flex-col"
       style={{
         background: "var(--surface)",
@@ -359,6 +361,7 @@ export default function Filter() {
       >
         {loading ? "Looking for places..." : "Find places →"}
       </button>
-    </main>
+      </main>
+    </PageTransition>
   )
 }

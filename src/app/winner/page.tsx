@@ -3,6 +3,8 @@
 import { useStore } from "@/store"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { motion } from "framer-motion"
+import PageTransition from "@/components/PageTransition"
 import { MapPin, Clock, Banknote, PersonStanding } from "lucide-react"
 
 const PRICE_LABEL: Record<string, string> = {
@@ -96,10 +98,11 @@ export default function Winner() {
   }
 
   return (
-    <main
-      className="flex flex-col"
-      style={{ background: "var(--surface)", height: "100dvh", overflow: "hidden" }}
-    >
+    <PageTransition>
+      <main
+        className="flex flex-col"
+        style={{ background: "var(--surface)", height: "100dvh", overflow: "hidden" }}
+      >
       {/* Dark hero */}
       <div
         className="flex flex-col justify-end px-5 pb-6"
@@ -167,9 +170,12 @@ export default function Winner() {
           </p>
         )}
         {detailRows.map((row, i) => (
-          <div
+          <motion.div
             key={i}
             className="flex items-start gap-3"
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: 0.15 + i * 0.1, ease: "easeOut" }}
             style={{
               padding: "14px 0",
               borderBottom: i < detailRows.length - 1 ? "1px solid var(--border)" : "none",
@@ -209,7 +215,7 @@ export default function Winner() {
                 </span>
               )}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
@@ -294,6 +300,7 @@ export default function Winner() {
           Details may be incomplete or outdated. Always check before heading out.
         </p>
       </div>
-    </main>
+      </main>
+    </PageTransition>
   )
 }

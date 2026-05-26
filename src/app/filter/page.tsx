@@ -192,7 +192,10 @@ export default function Filter() {
 
         {/* CTA */}
         <button
-          onClick={() => fetchPlaces()}
+          onClick={() => {
+            const isMobile = /iPhone|iPad|iPod|Android/.test(navigator.userAgent)
+            isMobile ? window.location.reload() : fetchPlaces()
+          }}
           style={{
             background: "var(--text-main)", color: "var(--white)",
             fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,

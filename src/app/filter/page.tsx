@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { MapPin } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import LoadingScreen from "@/components/LoadingScreen"
@@ -14,6 +15,7 @@ export default function Filter() {
   const resetModes = useStore((state) => state.resetModes)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [locationDenied, setLocationDenied] = useState(false)
 
   const categoryMap: Record<string, string> = {
     "All":       "restaurant or cafe or food near me",
@@ -93,7 +95,7 @@ export default function Filter() {
       (geoError) => {
         setLoading(false)
         if (geoError.code === geoError.PERMISSION_DENIED) {
-          setError("Location permission denied. Please enable it in your browser settings.")
+          setLocationDenied(true)
         } else if (geoError.code === geoError.POSITION_UNAVAILABLE) {
           setError("Could not determine your location.")
         } else {
@@ -101,6 +103,58 @@ export default function Filter() {
         }
       },
       { timeout: 10000 }
+    )
+  }
+
+  if (locationDenied) {
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+    return (
+      <main
+        className="flex flex-col items-center justify-center px-6 text-center gap-6"
+        style={{ background: "var(--surface)", height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <MapPin size={48} strokeWidth={1.5} color="var(--brand)" />
+        <div className="flex flex-col gap-2">
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "clamp(28px, 8vw, 40px)", color: "var(--text-main)", letterSpacing: "-0.5px", lineHeight: 1 }}>
+            Kailangan ng location mo
+          </h2>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.5 }}>
+            Para mahanap namin ang mga kainan malapit sa iyo, i-allow mo lang ang location.
+          </p>
+        </div>
+        <div
+          className="w-full flex flex-col gap-3 text-left"
+          style={{ background: "var(--surface-dark)", borderRadius: "8px", padding: "16px 20px" }}
+        >
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+            {isIOS ? "Para sa iPhone" : "Para sa Android"}
+          </p>
+          {isIOS ? (
+            <ol className="flex flex-col gap-2" style={{ paddingLeft: "16px" }}>
+              {["Buksan ang Settings", "Scroll down, hanapin ang Safari", "Tap Location", "Piliin ang 'While Using the App' o 'Ask'", "Bumalik dito at subukan ulit"].map((step, i) => (
+                <li key={i} style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.4 }}>{step}</li>
+              ))}
+            </ol>
+          ) : (
+            <ol className="flex flex-col gap-2" style={{ paddingLeft: "16px" }}>
+              {["I-tap ang lock icon sa address bar ng browser", "Tap Permissions", "I-allow ang Location", "I-refresh ang page"].map((step, i) => (
+                <li key={i} style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.4 }}>{step}</li>
+              ))}
+            </ol>
+          )}
+        </div>
+        <button
+          onClick={() => setLocationDenied(false)}
+          style={{
+            background: "var(--text-main)", color: "var(--white)",
+            fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
+            fontSize: "clamp(18px, 5vw, 22px)", letterSpacing: "0.5px",
+            padding: "14px 32px", border: "none", borderRadius: "4px", cursor: "pointer",
+          }}
+        >
+          Subukan ulit
+        </button>
+      </main>
     )
   }
 

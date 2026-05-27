@@ -18,10 +18,10 @@ const PRICE_LABEL: Record<string, string> = {
 
 function getNameFontSize(name: string) {
   const len = name.length
-  if (len <= 8)  return "clamp(64px, 20vw, 96px)"
-  if (len <= 16) return "clamp(48px, 15vw, 72px)"
-  if (len <= 28) return "clamp(36px, 11vw, 56px)"
-  return "clamp(28px, 9vw, 44px)"
+  if (len <= 8)  return "clamp(72px, 22vw, 108px)"
+  if (len <= 16) return "clamp(56px, 17vw, 84px)"
+  if (len <= 28) return "clamp(44px, 13vw, 68px)"
+  return "clamp(36px, 11vw, 56px)"
 }
 
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {

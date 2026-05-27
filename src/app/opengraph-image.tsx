@@ -11,6 +11,9 @@ export default function Image() {
   const iconData = readFileSync(join(process.cwd(), "public/web-app-manifest-512x512.png"))
   const iconBase64 = `data:image/png;base64,${iconData.toString("base64")}`
 
+  const fontBold = readFileSync(join(process.cwd(), "public/fonts/BarlowCondensed-ExtraBold.ttf"))
+  const fontSemiBold = readFileSync(join(process.cwd(), "public/fonts/BarlowCondensed-SemiBold.ttf"))
+
   return new ImageResponse(
     (
       <div
@@ -41,9 +44,9 @@ export default function Image() {
         >
           <span
             style={{
-              fontFamily: "sans-serif",
+              fontFamily: "Barlow Condensed",
               fontWeight: 800,
-              fontSize: "72px",
+              fontSize: "80px",
               color: "#1A1208",
               letterSpacing: "-2px",
               lineHeight: 1,
@@ -53,8 +56,8 @@ export default function Image() {
           </span>
           <span
             style={{
-              fontFamily: "sans-serif",
-              fontSize: "28px",
+              fontFamily: "Barlow Condensed",
+              fontSize: "32px",
               color: "#C41E3A",
               fontWeight: 600,
             }}
@@ -64,6 +67,12 @@ export default function Image() {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [
+        { name: "Barlow Condensed", data: fontBold, weight: 800 },
+        { name: "Barlow Condensed", data: fontSemiBold, weight: 600 },
+      ],
+    }
   )
 }

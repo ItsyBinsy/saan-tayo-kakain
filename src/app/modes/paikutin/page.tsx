@@ -13,6 +13,7 @@ const Wheel = dynamic(() => import("react-custom-roulette").then(m => m.Wheel), 
 export default function Paikutin() {
   const router = useRouter()
   const places = useStore((state) => state.places)
+  const usedModes = useStore((state) => state.usedModes)
   const setWinner = useStore((state) => state.setWinner)
   const addUsedMode = useStore((state) => state.addUsedMode)
 
@@ -21,8 +22,9 @@ export default function Paikutin() {
   const [showLoading, setShowLoading] = useState(false)
 
   useEffect(() => {
-    if (places.length === 0) router.push("/filter")
-  }, [])
+    if (places.length === 0) router.replace("/filter")
+    else if (!showLoading && usedModes.includes("paikutin")) router.replace("/winner")
+  }, [places, usedModes, showLoading, router])
 
   const truncate = (text: string, max: number) =>
     text.length > max ? text.slice(0, max - 1) + "…" : text
@@ -72,81 +74,87 @@ export default function Paikutin() {
 
   return (
     <main
-      className="flex flex-col"
+      className="flex flex-col items-center"
       style={{
-        background: "var(--surface-dark)",
+        background: "var(--surface)",
         height: "100dvh",
         overflow: "hidden",
+        paddingTop: "calc(env(safe-area-inset-top) + 32px)",
+        paddingBottom: "env(safe-area-inset-bottom)",
       }}
+      onClick={spinWheel}
     >
-      {/* Header */}
-      <div
-        className="flex flex-col justify-end px-5 pb-5"
-        style={{ height: "28dvh", flexShrink: 0 }}
-      >
+      {/* Title — small, above the wheel */}
+      <div className="w-full px-5 mb-4" style={{ flexShrink: 0 }}>
         <h1
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
-            fontSize: "clamp(56px, 18cqw, 88px)",
-            color: "var(--white)",
-            letterSpacing: "-2px",
-            lineHeight: "0.85",
+            fontSize: "clamp(40px, 12cqw, 64px)",
+            color: "var(--text-main)",
+            letterSpacing: "-1.5px",
+            lineHeight: "0.88",
           }}
         >
           Paikutin
         </h1>
         <p
-          className="mt-2"
+          className="mt-1"
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: "13px",
+            fontSize: "12px",
             color: "var(--text-muted)",
           }}
         >
-          {places.length} candidates · {spinning ? "spinning..." : "tap to spin"}
+          {places.length} candidates · {spinning ? "spinning..." : "tap anywhere to spin"}
         </p>
       </div>
 
-      {/* Wheel area — all dark, tap anywhere */}
+      {/* Wheel — hero element, takes remaining space */}
       <div
         className="flex flex-col items-center justify-center"
         style={{
-          borderTop: "3px solid var(--text-muted)",
           flex: 1,
           minHeight: 0,
+          width: "100%",
           cursor: spinning ? "default" : "pointer",
-          paddingBottom: "env(safe-area-inset-bottom)",
         }}
-        onClick={spinWheel}
       >
-        <Wheel
-          mustStartSpinning={spinning}
-          prizeNumber={prizeNumber}
-          data={data}
-          onStopSpinning={handleStop}
-          backgroundColors={[
-            "#C41E3A", "#F5F0E8", "#8B1020", "#F5F0E8",
-            "#C41E3A", "#F5F0E8", "#8B1020", "#F5F0E8",
-            "#C41E3A", "#F5F0E8",
-          ]}
-          textColors={[
-            "#F5F0E8", "#1A1208", "#F5F0E8", "#1A1208",
-            "#F5F0E8", "#1A1208", "#F5F0E8", "#1A1208",
-            "#F5F0E8", "#1A1208",
-          ]}
-          outerBorderColor="#F5F0E8"
-          outerBorderWidth={3}
-          innerBorderColor="#F5F0E8"
-          innerBorderWidth={0}
-          radiusLineColor="#F5F0E8"
-          radiusLineWidth={1}
-          fontSize={10}
-          pointerProps={{
-            style: { display: "none" },
-          }}
-        />
+        <div style={{
+          filter: "drop-shadow(0px 8px 24px rgba(26,18,8,0.22)) drop-shadow(0px 2px 6px rgba(196,30,58,0.18))",
+          borderRadius: "50%",
+        }}>
+          <Wheel
+            mustStartSpinning={spinning}
+            prizeNumber={prizeNumber}
+            data={data}
+            onStopSpinning={handleStop}
+            backgroundColors={[
+              "#C41E3A", "#1A1208", "#A01830", "#2A1F10",
+              "#C41E3A", "#1A1208", "#A01830", "#2A1F10",
+              "#C41E3A", "#1A1208",
+            ]}
+            textColors={[
+              "#F5F0E8", "#F5F0E8", "#F5F0E8", "#F5F0E8",
+              "#F5F0E8", "#F5F0E8", "#F5F0E8", "#F5F0E8",
+              "#F5F0E8", "#F5F0E8",
+            ]}
+            outerBorderColor="#1A1208"
+            outerBorderWidth={6}
+            innerRadius={10}
+            innerBorderColor="#C41E3A"
+            innerBorderWidth={6}
+            radiusLineColor="#1A1208"
+            radiusLineWidth={1}
+            fontSize={10}
+            fontWeight={700}
+            pointerProps={{
+              style: { display: "none" },
+            }}
+          />
+        </div>
       </div>
     </main>
   )
+
 }

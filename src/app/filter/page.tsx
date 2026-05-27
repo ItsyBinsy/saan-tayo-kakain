@@ -320,16 +320,25 @@ export default function Filter() {
           flexShrink: 0,
         }}
       >
-        <span style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontWeight: 800,
-          fontSize: "15px",
-          color: "var(--text-main)",
-          marginRight: "4px",
-          flexShrink: 0,
-        }}>
-          Budget
-        </span>
+        <div className="flex flex-col" style={{ marginRight: "4px", flexShrink: 0 }}>
+          <span style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 800,
+            fontSize: "15px",
+            color: "var(--text-main)",
+            lineHeight: 1.1,
+          }}>
+            Budget
+          </span>
+          <span style={{
+            fontFamily: "var(--font-body)",
+            fontSize: "9px",
+            color: "var(--text-muted)",
+            lineHeight: 1,
+          }}>
+            per person
+          </span>
+        </div>
         {["Any", "₱100", "₱200", "₱300"].map((item) => {
           const isSelected = budget === item
           return (

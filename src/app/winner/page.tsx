@@ -3,6 +3,7 @@
 import { useStore } from "@/store"
 import { useRouter } from "next/navigation"
 import { useEffect, useState, useRef } from "react"
+import { useHydrated } from "@/hooks/useHydrated"
 import { motion } from "framer-motion"
 import PageTransition from "@/components/PageTransition"
 import { MapPin, Clock, Banknote, PersonStanding, Share2, RotateCcw, RefreshCw } from "lucide-react"
@@ -35,20 +36,17 @@ export default function Winner() {
   const resetModes = useStore((state) => state.resetModes)
   const clearWinner = useStore((state) => state.clearWinner)
 
-  const [hydrated, setHydrated] = useState(false)
+  const hydrated = useHydrated()
+  const [confirmMode, setConfirmMode] = useState(false)
   const navigatingAway = useRef(false)
-
-  useEffect(() => {
-    const unsub = useStore.persist.onFinishHydration(() => setHydrated(true))
-    if (useStore.persist.hasHydrated()) setHydrated(true)
-    return unsub
-  }, [])
 
   useEffect(() => {
     if (hydrated && !winner && !navigatingAway.current) router.push("/filter")
   }, [hydrated, winner, router])
 
-  if (!hydrated || !winner) return null
+  if (!hydrated || !winner) return (
+    <div style={{ background: "var(--surface)", height: "100dvh" }} />
+  )
 
   const allModesUsed = ["paikutin", "this-or-that", "bahala-na"].every(
     (m) => usedModes.includes(m)
@@ -131,9 +129,9 @@ export default function Winner() {
         >
           <motion.p
             className="uppercase tracking-widest mb-3"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "11px",
@@ -144,9 +142,9 @@ export default function Winner() {
             {allModesUsed ? "Universe has spoken." : "It's decided."}
           </motion.p>
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
+            initial={{ opacity: 0, scale: 0.92, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
             style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 800,
@@ -160,7 +158,12 @@ export default function Winner() {
           >
             {winner.displayName.text}
           </motion.h1>
-          <div className="flex items-center gap-1 mt-3">
+          <motion.div
+            className="flex items-center gap-1 mt-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut", delay: 0.55 }}
+          >
             <MapPin size={11} strokeWidth={2.5} color="var(--text-muted)" aria-hidden />
             <p
               style={{
@@ -171,7 +174,7 @@ export default function Winner() {
             >
               {shortAddress}
             </p>
-          </div>
+          </motion.div>
         </div>
 
         {/* Details */}
@@ -236,7 +239,7 @@ export default function Winner() {
             </motion.div>
           ))}
 
-          {/* Secondary action chips */}
+          {/* Secondary actions */}
           <div className="flex gap-2 mt-4">
             {canShare && (
               <button
@@ -256,6 +259,7 @@ export default function Winner() {
                   borderRadius: "4px",
                   padding: "6px 12px",
                   cursor: "pointer",
+                  alignSelf: "flex-start",
                 }}
               >
                 <Share2 size={12} strokeWidth={2} aria-hidden />
@@ -264,22 +268,29 @@ export default function Winner() {
             )}
             {!allModesUsed && (
               <button
-                onClick={() => { navigatingAway.current = true; clearWinner(); router.push("/modes") }}
-                className="flex items-center gap-1.5"
+                onClick={() => {
+                  if (!confirmMode) { setConfirmMode(true); return }
+                  navigatingAway.current = true
+                  clearWinner()
+                  router.push("/modes")
+                }}
+                onBlur={() => setConfirmMode(false)}
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: "12px",
                   fontWeight: 600,
-                  color: "var(--text-muted)",
+                  color: confirmMode ? "var(--brand)" : "var(--text-muted)",
                   background: "transparent",
-                  border: "1.5px solid var(--border)",
+                  border: confirmMode ? "1.5px solid var(--brand)" : "1.5px solid var(--border)",
                   borderRadius: "4px",
                   padding: "6px 12px",
                   cursor: "pointer",
+                  transition: "color 150ms ease, border-color 150ms ease",
                 }}
+              className="flex items-center gap-1.5"
               >
                 <RotateCcw size={12} strokeWidth={2} aria-hidden />
-                Try another mode
+                {confirmMode ? "Sure? Tap again" : "Try another mode"}
               </button>
             )}
           </div>

@@ -9,6 +9,7 @@ import afterThisOrThatAnim from "@/animations/after-this-or-that.json"
 export default function ThisOrThat() {
   const router = useRouter()
   const places = useStore((state) => state.places)
+  const usedModes = useStore((state) => state.usedModes)
   const setWinner = useStore((state) => state.setWinner)
   const addUsedMode = useStore((state) => state.addUsedMode)
 
@@ -20,8 +21,9 @@ export default function ThisOrThat() {
   const [showLoading, setShowLoading] = useState(false)
 
   useEffect(() => {
-    if (candidates.length < 2) router.push("/filter")
-  }, [])
+    if (candidates.length < 2) router.replace("/filter")
+    else if (!showLoading && usedModes.includes("this-or-that")) router.replace("/winner")
+  }, [candidates.length, usedModes, showLoading, router])
 
   const handlePick = (winner: typeof candidates[0]) => {
     const newRemaining = remaining.filter((p) => p !== left && p !== right)
@@ -66,12 +68,16 @@ export default function ThisOrThat() {
   return (
     <main
       className="flex flex-col"
-      style={{ background: "var(--surface-dark)", height: "100dvh", overflow: "hidden" }}
+      style={{ background: "var(--surface)", height: "100dvh", overflow: "hidden" }}
     >
-      {/* Dark hero header */}
+      {/* Header */}
       <div
         className="flex flex-col justify-end px-5 pb-5"
-        style={{ height: "42dvh", flexShrink: 0 }}
+        style={{
+          height: "42dvh",
+          flexShrink: 0,
+          paddingTop: "calc(env(safe-area-inset-top) + 20px)",
+        }}
       >
         <p
           className="uppercase tracking-widest mb-3"
@@ -89,7 +95,7 @@ export default function ThisOrThat() {
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
             fontSize: "clamp(56px, 18cqw, 88px)",
-            color: "var(--white)",
+            color: "var(--text-main)",
             letterSpacing: "-2px",
             lineHeight: "0.88",
           }}

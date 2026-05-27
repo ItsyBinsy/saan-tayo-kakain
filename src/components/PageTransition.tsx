@@ -7,7 +7,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
     >
       {children}

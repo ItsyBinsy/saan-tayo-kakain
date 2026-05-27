@@ -58,6 +58,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en-PH" className={`${barlowCondensed.variable} ${spaceGrotesk.variable}`}>
+      <head>
+        {["all","rice","fastfood","snack","dessert","drinks"].map(n => (
+          <link key={n} rel="preload" as="image" href={`/icons/${n}.png`} />
+        ))}
+      </head>
       <body suppressHydrationWarning>
         <Script src="https://tally.so/widgets/embed.js" strategy="afterInteractive" />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-42N9LG081H" strategy="afterInteractive" />

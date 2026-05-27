@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Saan Tayo Kakain",
     description: "Tabi. Ako na pipili. No more arguments about where to eat.",
   },

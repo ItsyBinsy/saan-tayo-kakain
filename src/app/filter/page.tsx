@@ -234,7 +234,6 @@ export default function Filter() {
             letterSpacing: "-1px",
             lineHeight: "0.88",
             color: "var(--text-main)",
-            overflow: "hidden",
           }}
         >
           <motion.span

@@ -237,7 +237,7 @@ export default function Winner() {
               background: "var(--brand)",
               padding: "18px",
               textDecoration: "none",
-              borderRight: !allModesUsed ? "2px solid var(--border)" : "none",
+              borderRight: "2px solid var(--border)",
             }}
           >
             <span
@@ -253,6 +253,28 @@ export default function Winner() {
             </span>
             <span style={{ color: "var(--white)", fontSize: "16px", marginTop: "2px", opacity: 0.7 }}>→</span>
           </a>
+
+          {typeof navigator !== "undefined" && !!navigator.share && (
+            <button
+              onClick={() => navigator.share({ title: winner.displayName.text, url: mapsUrl })}
+              className="flex flex-col items-center justify-center"
+              style={{
+                flex: 1,
+                background: "var(--surface)",
+                padding: "18px",
+                border: "none",
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 800,
+                fontSize: "clamp(18px, 5vw, 24px)",
+                color: "var(--text-main)",
+                letterSpacing: "-0.5px",
+                cursor: "pointer",
+                borderRight: !allModesUsed ? "2px solid var(--border)" : "none",
+              }}
+            >
+              Share
+            </button>
+          )}
 
           {!allModesUsed && (
             <button

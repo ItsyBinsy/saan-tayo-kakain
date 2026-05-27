@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { MapPin } from "lucide-react"
 import PageTransition from "@/components/PageTransition"
@@ -11,6 +11,10 @@ import findingPlacesAnim from "@/animations/finding-places.json"
 
 export default function Filter() {
   const router = useRouter()
+
+  useEffect(() => {
+    router.prefetch("/modes")
+  }, [router])
   const [mealType, setMealType] = useState("All")
   const [budget, setBudget] = useState("Any")
   const setPlaces = useStore((state) => state.setPlaces)

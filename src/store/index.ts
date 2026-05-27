@@ -20,6 +20,7 @@ type Store = {
     setMealType: (mealType: string) => void
     setBudget: (budget: string) => void
     setWinner: (winner: Place) => void
+    clearWinner: () => void
     addUsedMode: (mode: string) => void
     resetModes: () => void
 }
@@ -36,6 +37,7 @@ export const useStore = create<Store>()(
             setMealType: (mealType) => set({ mealType }),
             setBudget: (budget) => set({ budget }),
             setWinner: (winner) => set({ winner }),
+            clearWinner: () => set({ winner: null }),
             addUsedMode: (mode) => set((state) => ({
                 usedModes: [...state.usedModes, mode]
             })),

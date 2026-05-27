@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { motion } from "framer-motion"
-import Lottie from "lottie-react"
+import dynamic from "next/dynamic"
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false })
 import splashAnim from "@/animations/splash.json"
 
 export default function Home() {

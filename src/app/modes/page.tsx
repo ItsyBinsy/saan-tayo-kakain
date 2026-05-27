@@ -4,11 +4,16 @@ import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import { motion } from "framer-motion"
 import PageTransition from "@/components/PageTransition"
+import { useEffect } from "react"
 
 export default function Modes() {
   const router = useRouter()
   const places = useStore((state) => state.places)
   const usedModes = useStore((state) => state.usedModes)
+
+  useEffect(() => {
+    if (places.length === 0) router.replace("/filter")
+  }, [places, router])
 
   const modes = [
     { id: "paikutin", name: "Paikutin", sub: "Spin the wheel" },

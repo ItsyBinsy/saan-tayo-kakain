@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 
+if (!process.env.GOOGLE_PLACES_API_KEY) {
+  throw new Error("GOOGLE_PLACES_API_KEY is not set")
+}
+
+const MAX_PLACES = 10
+
 const ALLOWED_CATEGORIES = new Set([
   "restaurant or cafe or food near me",
   "Filipino restaurant or carinderia or turo-turo",
@@ -65,7 +71,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         textQuery,
-        maxResultCount: 20,
+        maxResultCount: MAX_PLACES,
         locationBias: {
           circle: { center: { latitude, longitude }, radius: 500 },
         },

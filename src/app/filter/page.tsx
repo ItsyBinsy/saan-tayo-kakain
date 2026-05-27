@@ -91,7 +91,7 @@ export default function Filter() {
             setLoading(false)
             return
           }
-          setPlaces(filtered.slice(0, 10))
+          setPlaces(filtered.slice(0, 10)) // matches MAX_PLACES in api/places/route.ts
           setLocationDenied(false)
           router.push("/modes")
         } catch (e) {

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { motion } from "framer-motion"
 import PageTransition from "@/components/PageTransition"
-import { MapPin, Clock, Banknote, PersonStanding, Share2, RotateCcw } from "lucide-react"
+import { MapPin, Clock, Banknote, PersonStanding, Share2, RotateCcw, RefreshCw } from "lucide-react"
 
 const PRICE_LABEL: Record<string, string> = {
   PRICE_LEVEL_FREE:           "Free",
@@ -32,6 +32,8 @@ export default function Winner() {
   const winner = useStore((state) => state.winner)
   const usedModes = useStore((state) => state.usedModes)
   const places = useStore((state) => state.places)
+  const resetModes = useStore((state) => state.resetModes)
+  const clearWinner = useStore((state) => state.clearWinner)
 
   useEffect(() => {
     if (!winner) router.push("/filter")
@@ -253,7 +255,7 @@ export default function Winner() {
             )}
             {!allModesUsed && (
               <button
-                onClick={() => router.push("/modes")}
+                onClick={() => { clearWinner(); router.push("/modes") }}
                 className="flex items-center gap-1.5"
                 style={{
                   fontFamily: "var(--font-body)",
@@ -274,17 +276,37 @@ export default function Winner() {
           </div>
 
           {allModesUsed && (
-            <p
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "11px",
-                color: "var(--text-muted)",
-                marginTop: "10px",
-                fontStyle: "italic",
-              }}
-            >
-              You've used all modes. Sige na, tara na doon.
-            </p>
+            <div className="flex flex-col gap-2 mt-1">
+              <p
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "11px",
+                  color: "var(--text-muted)",
+                  fontStyle: "italic",
+                }}
+              >
+                You've used all modes. Sige na, tara na doon.
+              </p>
+              <button
+                onClick={() => { resetModes(); router.push("/filter") }}
+                className="flex items-center gap-1.5"
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "var(--text-muted)",
+                  background: "transparent",
+                  border: "1.5px solid var(--border)",
+                  borderRadius: "4px",
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                  alignSelf: "flex-start",
+                }}
+              >
+                <RefreshCw size={12} strokeWidth={2} aria-hidden />
+                Start over
+              </button>
+            </div>
           )}
         </div>
 

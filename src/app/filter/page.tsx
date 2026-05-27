@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { motion } from "framer-motion"
 import { MapPin } from "lucide-react"
 import PageTransition from "@/components/PageTransition"
 import { useRouter } from "next/navigation"
@@ -233,9 +234,25 @@ export default function Filter() {
             letterSpacing: "-1px",
             lineHeight: "0.88",
             color: "var(--text-main)",
+            overflow: "hidden",
           }}
         >
-          Anong gusto<br />mo ngayon?
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
+            style={{ display: "block" }}
+          >
+            Anong gusto
+          </motion.span>
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
+            style={{ display: "block" }}
+          >
+            mo ngayon?
+          </motion.span>
         </h1>
       </div>
 

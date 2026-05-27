@@ -1,6 +1,21 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { Barlow_Condensed, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  display: "swap",
+  variable: "--font-barlow",
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+  variable: "--font-body-loaded",
+})
 
 export const metadata: Metadata = {
   title: "Saan Tayo Kakain",
@@ -42,7 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-PH">
+    <html lang="en-PH" className={`${barlowCondensed.variable} ${spaceGrotesk.variable}`}>
       <body>
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-42N9LG081H" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">

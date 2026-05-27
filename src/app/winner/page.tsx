@@ -116,8 +116,11 @@ export default function Winner() {
           paddingTop: "calc(32px + env(safe-area-inset-top))",
         }}
       >
-        <p
+        <motion.p
           className="uppercase tracking-widest mb-3"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
           style={{
             fontFamily: "var(--font-body)",
             fontSize: "11px",
@@ -126,8 +129,11 @@ export default function Winner() {
           }}
         >
           {allModesUsed ? "Universe has spoken." : "It's decided."}
-        </p>
-        <h1
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
@@ -140,7 +146,7 @@ export default function Winner() {
           }}
         >
           {winner.displayName.text}
-        </h1>
+        </motion.h1>
         <div className="flex items-center gap-1 mt-3">
           <MapPin size={11} strokeWidth={2.5} color="var(--text-muted)" aria-hidden />
           <p

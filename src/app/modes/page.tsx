@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
+import { motion } from "framer-motion"
 import PageTransition from "@/components/PageTransition"
 
 export default function Modes() {
@@ -50,7 +51,22 @@ export default function Modes() {
             paddingLeft: "16px",
           }}
         >
-          Ano,<br />tara?
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
+            style={{ display: "block" }}
+          >
+            Ano,
+          </motion.span>
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
+            style={{ display: "block" }}
+          >
+            tara?
+          </motion.span>
         </h1>
         <p
           className="mt-2 px-5"

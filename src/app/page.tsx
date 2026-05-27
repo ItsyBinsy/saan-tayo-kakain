@@ -1,12 +1,17 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import { motion } from "framer-motion"
 import Lottie from "lottie-react"
 import splashAnim from "@/animations/splash.json"
 
 export default function Home() {
   const router = useRouter()
+
+  useEffect(() => {
+    router.prefetch("/filter")
+  }, [router])
 
   return (
     <main

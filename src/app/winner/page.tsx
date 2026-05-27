@@ -2,7 +2,7 @@
 
 import { useStore } from "@/store"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState, useRef } from "react"
 import { motion } from "framer-motion"
 import PageTransition from "@/components/PageTransition"
 import { MapPin, Clock, Banknote, PersonStanding, Share2, RotateCcw, RefreshCw } from "lucide-react"
@@ -35,11 +35,20 @@ export default function Winner() {
   const resetModes = useStore((state) => state.resetModes)
   const clearWinner = useStore((state) => state.clearWinner)
 
-  useEffect(() => {
-    if (!winner) router.push("/filter")
-  }, [winner, router])
+  const [hydrated, setHydrated] = useState(false)
+  const navigatingAway = useRef(false)
 
-  if (!winner) return null
+  useEffect(() => {
+    const unsub = useStore.persist.onFinishHydration(() => setHydrated(true))
+    if (useStore.persist.hasHydrated()) setHydrated(true)
+    return unsub
+  }, [])
+
+  useEffect(() => {
+    if (hydrated && !winner && !navigatingAway.current) router.push("/filter")
+  }, [hydrated, winner, router])
+
+  if (!hydrated || !winner) return null
 
   const allModesUsed = ["paikutin", "this-or-that", "bahala-na"].every(
     (m) => usedModes.includes(m)
@@ -255,7 +264,7 @@ export default function Winner() {
             )}
             {!allModesUsed && (
               <button
-                onClick={() => { clearWinner(); router.push("/modes") }}
+                onClick={() => { navigatingAway.current = true; clearWinner(); router.push("/modes") }}
                 className="flex items-center gap-1.5"
                 style={{
                   fontFamily: "var(--font-body)",
@@ -288,7 +297,7 @@ export default function Winner() {
                 You've used all modes. Sige na, tara na doon.
               </p>
               <button
-                onClick={() => { resetModes(); router.push("/filter") }}
+                onClick={() => { navigatingAway.current = true; resetModes(); router.push("/filter") }}
                 className="flex items-center gap-1.5"
                 style={{
                   fontFamily: "var(--font-body)",

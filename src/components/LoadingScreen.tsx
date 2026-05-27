@@ -27,15 +27,16 @@ export default function LoadingScreen({ animationData, message, sub, indicator =
         style={{ width: "50cqw", height: "50cqw", maxWidth: 240, maxHeight: 240, mixBlendMode: "multiply" }}
       />
 
-      <div className="flex flex-col items-center gap-2 text-center">
+      <div className="flex flex-col items-center gap-3 text-center">
         <p
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
-            fontSize: "clamp(22px, 7cqw, 32px)",
+            fontSize: "clamp(28px, 9cqw, 42px)",
             color: "var(--text-main)",
             letterSpacing: "-0.5px",
-            lineHeight: 1.05,
+            lineHeight: 1,
+            textTransform: "uppercase",
           }}
         >
           {message}
@@ -44,9 +45,10 @@ export default function LoadingScreen({ animationData, message, sub, indicator =
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: "11px",
-            color: "var(--text-muted)",
+            fontSize: "12px",
+            color: "var(--brand)",
             fontStyle: "italic",
+            letterSpacing: "0.02em",
           }}
         >
           &ldquo;{sub}&rdquo;

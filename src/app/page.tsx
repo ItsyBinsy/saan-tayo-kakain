@@ -64,9 +64,9 @@ export default function Home() {
       <motion.p
         className="absolute bottom-8 text-xs uppercase tracking-widest"
         style={{ color: "var(--text-muted)", fontFamily: "var(--font-body)" }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.8 }}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: [0, 0.5, 0.5, 0.2, 0.5], y: [8, 0, -4, 0, -4] }}
+        transition={{ delay: 1, duration: 3, repeat: Infinity, ease: "easeInOut" }}
       >
         Tap anywhere to start
       </motion.p>

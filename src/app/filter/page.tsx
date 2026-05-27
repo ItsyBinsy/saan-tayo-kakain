@@ -27,7 +27,7 @@ export default function Filter() {
     "All":       "restaurant or cafe or food near me",
     "Rice meal": "Filipino restaurant or carinderia or turo-turo",
     "Fast food": "fast food restaurant",
-    "Merienda":  "cafe or bakery or bread",
+    "Snacks":    "cafe or bakery or bread",
     "Dessert":   "dessert shop or ice cream or milk tea",
     "Drinks":    "cafe or juice bar or milk tea or smoothie",
   }
@@ -40,12 +40,12 @@ export default function Filter() {
   }
 
   const mealTypes = [
-    { label: "All",       icon: "🍽️" },
-    { label: "Rice meal", icon: "🍚" },
-    { label: "Fast food", icon: "🍔" },
-    { label: "Merienda",  icon: "☕" },
-    { label: "Dessert",   icon: "🍨" },
-    { label: "Drinks",    icon: "🧋" },
+    { label: "All",       icon: "/icons/all.png" },
+    { label: "Rice meal", icon: "/icons/rice.png" },
+    { label: "Fast food", icon: "/icons/fastfood.png" },
+    { label: "Snacks",    icon: "/icons/snack.png" },
+    { label: "Dessert",   icon: "/icons/dessert.png" },
+    { label: "Drinks",    icon: "/icons/drinks.png" },
   ]
 
   const fetchPlaces = async () => {
@@ -298,15 +298,17 @@ export default function Filter() {
               >
                 {item.label}
               </span>
-              <span
+              <img
+                src={item.icon}
+                alt=""
+                aria-hidden
                 style={{
-                  fontSize: "clamp(22px, 6cqw, 30px)",
+                  width: "clamp(56px, 14cqw, 72px)",
+                  height: "clamp(56px, 14cqw, 72px)",
                   alignSelf: "flex-end",
-                  lineHeight: 1,
+                  objectFit: "contain",
                 }}
-              >
-                {item.icon}
-              </span>
+              />
             </button>
           )
         })}

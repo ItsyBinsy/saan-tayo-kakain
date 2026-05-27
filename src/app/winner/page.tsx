@@ -47,10 +47,47 @@ export default function Winner() {
   const hydrated = useHydrated()
   const [confirmMode, setConfirmMode] = useState(false)
   const navigatingAway = useRef(false)
+  const shownFeedback = useRef(false)
+  const clickedDirections = useRef(false)
 
   useEffect(() => {
     if (hydrated && !winner && !navigatingAway.current) router.push("/filter")
   }, [hydrated, winner, router])
+
+  useEffect(() => {
+    if (!hydrated || !winner) return
+
+    const openFeedback = () => {
+      if (shownFeedback.current) return
+      shownFeedback.current = true
+      if (typeof window !== "undefined" && (window as any).Tally) {
+        ;(window as any).Tally.openPopup("81RbMo", {
+          layout: "modal",
+          width: 376,
+          alignLeft: true,
+          hideTitle: true,
+          overlay: true,
+          emoji: { text: "👋", animation: "wave" },
+          doNotShowAfterSubmit: true,
+          autoClose: 3000,
+        })
+      }
+    }
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible" && clickedDirections.current) {
+        openFeedback()
+      }
+    }
+
+    const timer = setTimeout(openFeedback, 15000)
+    document.addEventListener("visibilitychange", onVisibility)
+
+    return () => {
+      clearTimeout(timer)
+      document.removeEventListener("visibilitychange", onVisibility)
+    }
+  }, [hydrated, winner])
 
   if (!hydrated || !winner) return (
     <div style={{ background: "var(--surface)", height: "100dvh" }} />
@@ -344,6 +381,7 @@ export default function Winner() {
             href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => { clickedDirections.current = true }}
             className="flex flex-col items-center justify-center"
             style={{
               background: "var(--brand)",

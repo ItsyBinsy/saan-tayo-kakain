@@ -59,6 +59,7 @@ export default function RootLayout({
   return (
     <html lang="en-PH" className={`${barlowCondensed.variable} ${spaceGrotesk.variable}`}>
       <body suppressHydrationWarning>
+        <Script src="https://tally.so/widgets/embed.js" strategy="afterInteractive" />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-42N9LG081H" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`

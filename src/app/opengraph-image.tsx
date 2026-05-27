@@ -58,11 +58,11 @@ export default function Image() {
             style={{
               fontFamily: "Barlow Condensed",
               fontSize: "32px",
-              color: "#C41E3A",
+              color: "#7A6A56",
               fontWeight: 600,
             }}
           >
-            Tabi. Ako na pipili.
+            Tabi. Ako na.
           </span>
         </div>
       </div>

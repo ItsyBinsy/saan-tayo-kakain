@@ -29,41 +29,43 @@ export default function Home() {
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") router.push("/filter") }}
     >
       <motion.div
-        className="flex flex-col items-center gap-4 text-center px-6"
+        className="flex flex-col items-center px-6"
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <div
-          className="w-52 h-52 rounded-full flex items-center justify-center"
-        >
+        {/* Lottie stands at the base of the title */}
+        <div className="flex items-end gap-1">
           <Lottie
             animationData={splashAnim}
             loop
-            style={{ width: "clamp(120px, 38vw, 192px)", height: "clamp(120px, 38vw, 192px)", marginBottom: -58 }}
-          />
-        </div>
-
-        <div>
-          <h1
-            className="leading-none"
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800,
-              color: "var(--text-main)",
-              letterSpacing: "-1px",
-              lineHeight: "0.88",
-              fontSize: "clamp(72px, 22cqw, 110px)",
+              width: "clamp(80px, 24cqw, 140px)",
+              height: "clamp(80px, 24cqw, 140px)",
+              flexShrink: 0,
             }}
-          >
-            Saan<br />Tayo<br />Kakain
-          </h1>
-          <p
-            className="text-sm mt-3"
-            style={{ color: "var(--text-muted)", fontFamily: "var(--font-body)" }}
-          >
-            Tabi. Ako na.
-          </p>
+          />
+          <div>
+            <h1
+              className="leading-none"
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 800,
+                color: "var(--text-main)",
+                letterSpacing: "-1px",
+                lineHeight: "0.88",
+                fontSize: "clamp(72px, 22cqw, 110px)",
+              }}
+            >
+              Saan<br />Tayo<br />Kakain
+            </h1>
+            <p
+              className="text-sm mt-3 text-right"
+              style={{ color: "var(--text-muted)", fontFamily: "var(--font-body)" }}
+            >
+              Tabi. Ako na.
+            </p>
+          </div>
         </div>
       </motion.div>
 

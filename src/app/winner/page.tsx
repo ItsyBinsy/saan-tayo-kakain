@@ -16,6 +16,14 @@ const PRICE_LABEL: Record<string, string> = {
   PRICE_LEVEL_VERY_EXPENSIVE: "₱500+ per person",
 }
 
+function getNameFontSize(name: string) {
+  const len = name.length
+  if (len <= 8)  return "clamp(64px, 20vw, 96px)"
+  if (len <= 16) return "clamp(48px, 15vw, 72px)"
+  if (len <= 28) return "clamp(36px, 11vw, 56px)"
+  return "clamp(28px, 9vw, 44px)"
+}
+
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371
   const dLat = ((lat2 - lat1) * Math.PI) / 180
@@ -148,7 +156,7 @@ export default function Winner() {
             style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 800,
-              fontSize: "clamp(40px, 13vw, 72px)",
+              fontSize: getNameFontSize(winner.displayName.text),
               color: "var(--white)",
               letterSpacing: "-1.5px",
               lineHeight: "0.9",

@@ -179,9 +179,9 @@ export default function Filter() {
           className="flex flex-col justify-end px-5 pb-6"
           style={{
             background: "var(--surface-dark)",
-            minHeight: "38dvh",
+            minHeight: "28dvh",
             flexShrink: 0,
-            paddingTop: "calc(32px + env(safe-area-inset-top))",
+            paddingTop: "calc(20px + env(safe-area-inset-top))",
           }}
         >
           <div className="flex items-center gap-2 mb-3">
@@ -193,21 +193,18 @@ export default function Filter() {
           <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "clamp(36px, 12vw, 56px)", color: "var(--white)", letterSpacing: "-1px", lineHeight: 0.9 }}>
             Location<br />access needed
           </h2>
-          <p className="mt-3" style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.5 }}>
-            We need your location to find places near you.
-          </p>
         </div>
 
         {/* Steps + manual fallback */}
-        <div className="flex flex-col flex-1 px-5 py-5" style={{ gap: "0px", overflowY: "auto" }}>
+        <div className="flex flex-col flex-1 px-5 py-3" style={{ gap: "0px", overflowY: "auto" }}>
           {steps.map((step, i) => (
             <div
               key={i}
-              className="flex items-start gap-4"
+              className="flex items-start gap-3"
               style={{
-                paddingBottom: "16px",
+                paddingBottom: "10px",
                 borderBottom: "1px solid var(--border)",
-                paddingTop: i > 0 ? "16px" : 0,
+                paddingTop: i > 0 ? "10px" : 0,
               }}
             >
               <span
@@ -228,7 +225,7 @@ export default function Filter() {
           ))}
 
           {/* Manual location fallback */}
-          <div className="flex flex-col gap-2" style={{ paddingTop: "20px" }}>
+          <div className="flex flex-col gap-2" style={{ paddingTop: "12px" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 600, color: "var(--text-main)" }}>
               Still not working? Type your area instead.
             </p>

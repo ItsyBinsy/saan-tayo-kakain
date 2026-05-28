@@ -22,6 +22,8 @@ export default function Filter() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [locationDenied, setLocationDenied] = useState(false)
+  const [manualLocation, setManualLocation] = useState("")
+  const [manualLoading, setManualLoading] = useState(false)
 
   const categoryMap: Record<string, string> = {
     "All":       "restaurant or cafe or food near me",
@@ -47,6 +49,44 @@ export default function Filter() {
     { label: "Dessert",   icon: "/icons/dessert.png" },
     { label: "Drinks",    icon: "/icons/drinks.png" },
   ]
+
+  const fetchPlacesByText = async () => {
+    if (!manualLocation.trim()) return
+    setManualLoading(true)
+    setError(null)
+    resetModes()
+    try {
+      const query = `${categoryMap[mealType]} near ${manualLocation.trim()}`
+      const response = await fetch("/api/places", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ textQuery: query }),
+      })
+      if (!response.ok) {
+        const err = await response.json()
+        throw new Error(err.error ?? "Failed to fetch places")
+      }
+      const data = await response.json()
+      const allPlaces = (data.places ?? [])
+      const maxLevel = priceLevelMap[budget]
+      const filtered = allPlaces.filter((p: Place) => {
+        if (p.businessStatus === "CLOSED_PERMANENTLY") return false
+        if (!p.priceLevel || p.priceLevel === "PRICE_LEVEL_UNSPECIFIED") return true
+        const levels = ["PRICE_LEVEL_FREE","PRICE_LEVEL_INEXPENSIVE","PRICE_LEVEL_MODERATE","PRICE_LEVEL_EXPENSIVE","PRICE_LEVEL_VERY_EXPENSIVE"]
+        return levels.indexOf(p.priceLevel) <= maxLevel
+      })
+      if (filtered.length === 0) {
+        setError("No places found. Try a more specific location.")
+        setManualLoading(false)
+        return
+      }
+      setPlaces(filtered.slice(0, 10))
+      router.push("/modes")
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong.")
+      setManualLoading(false)
+    }
+  }
 
   const fetchPlaces = async () => {
     setError(null)
@@ -157,15 +197,15 @@ export default function Filter() {
           </p>
         </div>
 
-        {/* Steps */}
+        {/* Steps + manual fallback */}
         <div className="flex flex-col flex-1 px-5 py-5" style={{ gap: "0px", overflowY: "auto" }}>
           {steps.map((step, i) => (
             <div
               key={i}
               className="flex items-start gap-4"
               style={{
-                paddingBottom: i < steps.length - 1 ? "16px" : 0,
-                borderBottom: i < steps.length - 1 ? "1px solid var(--border)" : "none",
+                paddingBottom: "16px",
+                borderBottom: "1px solid var(--border)",
                 paddingTop: i > 0 ? "16px" : 0,
               }}
             >
@@ -185,22 +225,71 @@ export default function Filter() {
               </p>
             </div>
           ))}
+
+          {/* Manual location fallback */}
+          <div className="flex flex-col gap-2" style={{ paddingTop: "20px" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 600, color: "var(--text-main)" }}>
+              Still not working? Type your area instead.
+            </p>
+            <input
+              type="text"
+              value={manualLocation}
+              onChange={(e) => setManualLocation(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") fetchPlacesByText() }}
+              placeholder="e.g. Katipunan, Quezon City"
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "14px",
+                color: "var(--text-main)",
+                background: "var(--surface)",
+                border: "1.5px solid var(--border)",
+                borderRadius: "4px",
+                padding: "10px 12px",
+                outline: "none",
+                width: "100%",
+              }}
+            />
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--text-muted)", fontStyle: "italic" }}>
+              Be specific — include your city or a nearby landmark for better results.
+            </p>
+            {error && (
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--brand)" }}>
+                {error}
+              </p>
+            )}
+          </div>
         </div>
 
-        {/* CTA */}
-        <button
-          onClick={fetchPlaces}
-          style={{
-            background: "var(--text-main)", color: "var(--white)",
-            fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
-            fontSize: "clamp(18px, 5vw, 22px)", letterSpacing: "0.5px",
-            padding: "16px", border: "none", borderTop: "2px solid var(--border)",
-            width: "100%", flexShrink: 0, cursor: "pointer",
-            paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
-          }}
-        >
-          Try again
-        </button>
+        {/* CTAs */}
+        <div style={{ flexShrink: 0, borderTop: "2px solid var(--border)" }}>
+          <button
+            onClick={fetchPlacesByText}
+            disabled={!manualLocation.trim() || manualLoading}
+            style={{
+              background: manualLocation.trim() ? "var(--brand)" : "var(--border)",
+              color: "var(--white)",
+              fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
+              fontSize: "clamp(18px, 5vw, 22px)", letterSpacing: "0.5px",
+              padding: "16px", border: "none",
+              width: "100%", cursor: manualLocation.trim() ? "pointer" : "default",
+            }}
+          >
+            {manualLoading ? "Searching..." : "Search this area"}
+          </button>
+          <button
+            onClick={fetchPlaces}
+            style={{
+              background: "var(--text-main)", color: "var(--white)",
+              fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
+              fontSize: "clamp(18px, 5vw, 22px)", letterSpacing: "0.5px",
+              padding: "16px", border: "none", borderTop: "1px solid var(--border)",
+              width: "100%", cursor: "pointer",
+              paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
+            }}
+          >
+            Try again
+          </button>
+        </div>
       </main>
     )
   }

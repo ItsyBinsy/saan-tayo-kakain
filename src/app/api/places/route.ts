@@ -47,14 +47,23 @@ export async function POST(req: NextRequest) {
 
   const { textQuery, latitude, longitude } = body
 
-  if (!ALLOWED_CATEGORIES.has(textQuery)) {
-    return NextResponse.json({ error: "Invalid category" }, { status: 400 })
+  if (typeof textQuery !== "string" || textQuery.trim().length === 0 || textQuery.length > 200) {
+    return NextResponse.json({ error: "Invalid query" }, { status: 400 })
   }
-  if (typeof latitude !== "number" || typeof longitude !== "number") {
-    return NextResponse.json({ error: "Invalid location" }, { status: 400 })
-  }
-  if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-    return NextResponse.json({ error: "Coordinates out of range" }, { status: 400 })
+
+  const hasCoords = latitude !== undefined && longitude !== undefined
+  if (hasCoords) {
+    if (typeof latitude !== "number" || typeof longitude !== "number") {
+      return NextResponse.json({ error: "Invalid location" }, { status: 400 })
+    }
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      return NextResponse.json({ error: "Coordinates out of range" }, { status: 400 })
+    }
+  } else {
+    const baseQuery = textQuery.split(" near ")[0].trim()
+    if (!ALLOWED_CATEGORIES.has(baseQuery)) {
+      return NextResponse.json({ error: "Invalid category" }, { status: 400 })
+    }
   }
 
   const controller = new AbortController()
@@ -72,9 +81,11 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         textQuery,
         maxResultCount: MAX_PLACES,
-        locationBias: {
-          circle: { center: { latitude, longitude }, radius: 500 },
-        },
+        ...(hasCoords && {
+          locationBias: {
+            circle: { center: { latitude, longitude }, radius: 500 },
+          },
+        }),
       }),
     })
 

@@ -56,7 +56,8 @@ export default function Filter() {
     setError(null)
     resetModes()
     try {
-      const query = `${categoryMap[mealType]} near ${manualLocation.trim()}`
+      const baseCategory = categoryMap[mealType].replace(" near me", "")
+      const query = `${baseCategory} near ${manualLocation.trim()}`
       const response = await fetch("/api/places", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -250,7 +251,7 @@ export default function Filter() {
               }}
             />
             <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--text-muted)", fontStyle: "italic" }}>
-              Be specific — include your city or a nearby landmark for better results.
+              Be specific. Include your city or a nearby landmark for better results.
             </p>
             {error && (
               <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--brand)" }}>
@@ -279,15 +280,16 @@ export default function Filter() {
           <button
             onClick={fetchPlaces}
             style={{
-              background: "var(--text-main)", color: "var(--white)",
-              fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
-              fontSize: "clamp(18px, 5vw, 22px)", letterSpacing: "0.5px",
-              padding: "16px", border: "none", borderTop: "1px solid var(--border)",
+              background: "transparent", color: "var(--text-muted)",
+              fontFamily: "var(--font-body)", fontWeight: 600,
+              fontSize: "13px",
+              padding: "14px 16px",
+              border: "none", borderTop: "1px solid var(--border)",
               width: "100%", cursor: "pointer",
-              paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
+              paddingBottom: "calc(14px + env(safe-area-inset-bottom))",
             }}
           >
-            Try again
+            Or try again with GPS
           </button>
         </div>
       </main>

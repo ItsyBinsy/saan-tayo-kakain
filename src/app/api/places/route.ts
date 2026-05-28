@@ -60,8 +60,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Coordinates out of range" }, { status: 400 })
     }
   } else {
-    const baseQuery = textQuery.split(" near ")[0].trim()
-    if (!ALLOWED_CATEGORIES.has(baseQuery)) {
+    const baseCats = [...ALLOWED_CATEGORIES].map(cat => cat.replace(" near me", ""))
+    const isAllowed = baseCats.some(cat => textQuery.startsWith(cat))
+    if (!isAllowed) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 })
     }
   }

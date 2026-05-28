@@ -53,6 +53,11 @@ export default function Filter() {
     setLocationDenied(false)
     resetModes()
 
+    if (!navigator.geolocation) {
+      setError("Your browser does not support location access. Try a different browser.")
+      return
+    }
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         setLoading(true)
@@ -111,15 +116,14 @@ export default function Filter() {
           setError("Could not get your location. Please try again.")
         }
       },
-      { timeout: 10000 }
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
     )
   }
 
   if (locationDenied) {
     const steps = [
-      "Check your browser's address bar for a permissions or settings icon",
-      "Or go to your phone's Settings app and find your browser",
-      "Allow location access for this site",
+      "If a location prompt appeared, tap Allow then Try again below",
+      "If no prompt appeared, go to Settings, find your browser, and set Location to While Using",
       "Tap Try again below",
     ]
 
@@ -185,10 +189,7 @@ export default function Filter() {
 
         {/* CTA */}
         <button
-          onClick={() => {
-            const isMobile = /iPhone|iPad|iPod|Android/.test(navigator.userAgent)
-            isMobile ? window.location.reload() : fetchPlaces()
-          }}
+          onClick={fetchPlaces}
           style={{
             background: "var(--text-main)", color: "var(--white)",
             fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,

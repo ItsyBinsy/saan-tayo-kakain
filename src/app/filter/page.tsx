@@ -17,6 +17,7 @@ export default function Filter() {
   }, [router])
   const [mealType, setMealType] = useState("All")
   const [budget, setBudget] = useState("Any")
+  const [distance, setDistance] = useState("Walking distance")
   const setPlaces = useStore((state) => state.setPlaces)
   const resetModes = useStore((state) => state.resetModes)
   const [loading, setLoading] = useState(false)
@@ -32,6 +33,12 @@ export default function Filter() {
     "Snacks":    "cafe or bakery or bread",
     "Dessert":   "dessert shop or ice cream or milk tea",
     "Drinks":    "cafe or juice bar or milk tea or smoothie",
+  }
+
+  const distanceMap: Record<string, number> = {
+    "Around me":        300,
+    "Walking distance": 800,
+    "Short ride":       2000,
   }
 
   const priceLevelMap: Record<string, number> = {
@@ -99,9 +106,10 @@ export default function Filter() {
       return
     }
 
+    setLoading(true)
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        setLoading(true)
         try {
           const { latitude, longitude } = position.coords
           const response = await fetch("/api/places", {
@@ -111,6 +119,7 @@ export default function Filter() {
               textQuery: categoryMap[mealType],
               latitude,
               longitude,
+              radius: distanceMap[distance],
             }),
           })
           if (!response.ok) {
@@ -398,6 +407,41 @@ export default function Filter() {
                   objectFit: "contain",
                 }}
               />
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Distance row */}
+      <div
+        className="flex items-center gap-2 px-4 py-3"
+        style={{ borderTop: "2px solid var(--border)", flexShrink: 0 }}
+      >
+        <div className="flex flex-col" style={{ marginRight: "4px", flexShrink: 0 }}>
+          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "15px", color: "var(--text-main)", lineHeight: 1.1 }}>
+            Distance
+          </span>
+        </div>
+        {["Around me", "Walking distance", "Short ride"].map((item) => {
+          const isSelected = distance === item
+          return (
+            <button
+              key={item}
+              onClick={() => setDistance(item)}
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "11px",
+                fontWeight: 600,
+                borderRadius: "4px",
+                border: "1.5px solid var(--border)",
+                background: isSelected ? "var(--brand)" : "transparent",
+                color: isSelected ? "var(--white)" : "var(--text-main)",
+                padding: "4px 10px",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {item}
             </button>
           )
         })}

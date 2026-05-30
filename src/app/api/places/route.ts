@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
   }
 
-  const { textQuery, latitude, longitude } = body
+  const { textQuery, latitude, longitude, radius } = body
 
   if (typeof textQuery !== "string" || textQuery.trim().length === 0 || textQuery.length > 200) {
     return NextResponse.json({ error: "Invalid query" }, { status: 400 })
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
         maxResultCount: MAX_PLACES,
         ...(hasCoords && {
           locationBias: {
-            circle: { center: { latitude, longitude }, radius: 500 },
+            circle: { center: { latitude, longitude }, radius: typeof radius === "number" && radius > 0 ? radius : 500 },
           },
         }),
       }),

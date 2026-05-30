@@ -117,7 +117,7 @@ export default function Filter() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              textQuery: categoryMap[mealType],
+              category: mealType,
               latitude,
               longitude,
               radius: distanceMap[distance],

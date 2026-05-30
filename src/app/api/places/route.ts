@@ -6,8 +6,19 @@ if (!process.env.GOOGLE_PLACES_API_KEY) {
 
 const MAX_PLACES = 10
 
-const ALLOWED_CATEGORIES = new Set([
-  "restaurant or cafe or food near me",
+// nearbySearch uses includedTypes (Google place type codes)
+const CATEGORY_TYPES: Record<string, string[]> = {
+  "All":        ["restaurant", "cafe", "food_court", "fast_food_restaurant", "meal_takeaway", "meal_delivery"],
+  "Rice meal":  ["restaurant", "food_court", "meal_takeaway", "meal_delivery"],
+  "Fast food":  ["fast_food_restaurant", "hamburger_restaurant", "meal_takeaway"],
+  "Snacks":     ["bakery", "cafe", "sandwich_shop", "snack_bar"],
+  "Dessert":    ["dessert_shop", "ice_cream_shop", "chocolate_shop", "candy_store", "pastry_shop"],
+  "Drinks":     ["cafe", "juice_shop", "bubble_tea_shop", "coffee_shop"],
+}
+
+// searchText fallback (manual location) — still uses text queries
+const ALLOWED_TEXT_CATEGORIES = new Set([
+  "restaurant or cafe or food",
   "Filipino restaurant or carinderia or turo-turo",
   "fast food restaurant",
   "cafe or bakery or bread",
@@ -45,23 +56,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
   }
 
-  const { textQuery, latitude, longitude, radius } = body
+  const { category, textQuery, latitude, longitude, radius } = body
 
-  if (typeof textQuery !== "string" || textQuery.trim().length === 0 || textQuery.length > 200) {
-    return NextResponse.json({ error: "Invalid query" }, { status: 400 })
-  }
+  const hasCoords = typeof latitude === "number" && typeof longitude === "number"
 
-  const hasCoords = latitude !== undefined && longitude !== undefined
   if (hasCoords) {
-    if (typeof latitude !== "number" || typeof longitude !== "number") {
-      return NextResponse.json({ error: "Invalid location" }, { status: 400 })
-    }
     if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
       return NextResponse.json({ error: "Coordinates out of range" }, { status: 400 })
     }
+    if (!category || !CATEGORY_TYPES[category]) {
+      return NextResponse.json({ error: "Invalid category" }, { status: 400 })
+    }
   } else {
-    const baseCats = [...ALLOWED_CATEGORIES].map(cat => cat.replace(" near me", ""))
-    const isAllowed = baseCats.some(cat => textQuery.startsWith(cat))
+    if (typeof textQuery !== "string" || textQuery.trim().length === 0 || textQuery.length > 200) {
+      return NextResponse.json({ error: "Invalid query" }, { status: 400 })
+    }
+    const isAllowed = [...ALLOWED_TEXT_CATEGORIES].some(cat => textQuery.startsWith(cat))
     if (!isAllowed) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 })
     }
@@ -71,27 +81,50 @@ export async function POST(req: NextRequest) {
   const timeout = setTimeout(() => controller.abort(), 8000)
 
   try {
-    const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
-        "X-Goog-FieldMask": "places.displayName,places.location,places.formattedAddress,places.businessStatus,places.priceLevel,places.regularOpeningHours",
-      },
-      body: JSON.stringify({
-        textQuery,
-        maxResultCount: MAX_PLACES,
-        rankPreference: "DISTANCE",
-        ...(hasCoords && {
-          locationBias: {
-            circle: { center: { latitude, longitude }, radius: typeof radius === "number" && radius > 0 ? radius : 500 },
+    let response: Response
+
+    if (hasCoords) {
+      // GPS flow — use nearbySearch for hard radius guarantee
+      response = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
+          "X-Goog-FieldMask": "places.displayName,places.location,places.formattedAddress,places.businessStatus,places.priceLevel,places.regularOpeningHours",
+        },
+        body: JSON.stringify({
+          includedTypes: CATEGORY_TYPES[category],
+          maxResultCount: MAX_PLACES,
+          rankPreference: "DISTANCE",
+          locationRestriction: {
+            circle: {
+              center: { latitude, longitude },
+              radius: typeof radius === "number" && radius > 0 ? radius : 500,
+            },
           },
         }),
-      }),
-    })
+      })
+    } else {
+      // Manual location fallback — use searchText
+      response = await fetch("https://places.googleapis.com/v1/places:searchText", {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
+          "X-Goog-FieldMask": "places.displayName,places.location,places.formattedAddress,places.businessStatus,places.priceLevel,places.regularOpeningHours",
+        },
+        body: JSON.stringify({
+          textQuery,
+          maxResultCount: MAX_PLACES,
+        }),
+      })
+    }
 
     if (!response.ok) {
+      const errBody = await response.json().catch(() => ({}))
+      console.error("Places API error:", errBody)
       return NextResponse.json({ error: "Places API error" }, { status: 502 })
     }
 

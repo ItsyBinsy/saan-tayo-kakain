@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import { motion } from "framer-motion"
 import PageTransition from "@/components/PageTransition"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useHydrated } from "@/hooks/useHydrated"
 
 export default function Modes() {
@@ -12,6 +12,7 @@ export default function Modes() {
   const places = useStore((state) => state.places)
   const usedModes = useStore((state) => state.usedModes)
   const hydrated = useHydrated()
+  const navigating = useRef(false)
 
   useEffect(() => {
     if (hydrated && places.length === 0) router.replace("/filter")
@@ -109,7 +110,11 @@ export default function Modes() {
           return (
             <button
               key={mode.id}
-              onClick={() => !isDisabled && router.push(`/modes/${mode.id}`)}
+              onClick={() => {
+                if (isDisabled || navigating.current) return
+                navigating.current = true
+                router.push(`/modes/${mode.id}`)
+              }}
               aria-disabled={isDisabled}
               aria-label={isUsed ? `${mode.name} — already used` : isUnavailable ? `${mode.name} — needs at least 2 places` : mode.name}
               className="w-full flex items-center justify-between px-6"

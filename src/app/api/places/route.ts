@@ -13,7 +13,7 @@ const CATEGORY_TYPES: Record<string, string[]> = {
   "Fast food":  ["fast_food_restaurant", "hamburger_restaurant", "meal_takeaway"],
   "Snacks":     ["bakery", "cafe", "sandwich_shop", "snack_bar"],
   "Dessert":    ["dessert_shop", "ice_cream_shop", "chocolate_shop", "candy_store", "pastry_shop"],
-  "Drinks":     ["cafe", "juice_shop", "bubble_tea_shop", "coffee_shop"],
+  "Drinks":     ["cafe", "juice_shop", "tea_house", "coffee_shop"],
 }
 
 // searchText fallback (manual location) — still uses text queries

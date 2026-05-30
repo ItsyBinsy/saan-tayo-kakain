@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import { motion } from "framer-motion"
 import PageTransition from "@/components/PageTransition"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useHydrated } from "@/hooks/useHydrated"
 
 export default function Modes() {
@@ -13,6 +13,7 @@ export default function Modes() {
   const usedModes = useStore((state) => state.usedModes)
   const hydrated = useHydrated()
   const navigating = useRef(false)
+  const [tappedMode, setTappedMode] = useState<string | null>(null)
 
   useEffect(() => {
     if (hydrated && places.length === 0) router.replace("/filter")
@@ -113,6 +114,7 @@ export default function Modes() {
               onClick={() => {
                 if (isDisabled || navigating.current) return
                 navigating.current = true
+                setTappedMode(mode.id)
                 router.push(`/modes/${mode.id}`)
               }}
               aria-disabled={isDisabled}
@@ -122,7 +124,8 @@ export default function Modes() {
                 borderBottom: index < 2 ? "1.5px solid var(--border)" : "none",
                 background: "transparent",
                 cursor: isDisabled ? "not-allowed" : "pointer",
-                opacity: isDisabled ? 0.35 : 1,
+                opacity: isDisabled ? 0.35 : tappedMode === mode.id ? 0.5 : 1,
+                transition: "opacity 150ms ease",
                 flex: 1,
               }}
             >

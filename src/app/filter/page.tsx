@@ -9,17 +9,6 @@ import { useStore, type Place } from "@/store"
 import LoadingScreen from "@/components/LoadingScreen"
 import findingPlacesAnim from "@/animations/finding-places.json"
 
-function getDistanceM(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371000
-  const dLat = ((lat2 - lat1) * Math.PI) / 180
-  const dLon = ((lon2 - lon1) * Math.PI) / 180
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-    Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLon / 2) ** 2
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-}
 
 export default function Filter() {
   const router = useRouter()
@@ -141,7 +130,6 @@ export default function Filter() {
           const data = await response.json()
           const allPlaces = (data.places ?? [])
           const maxLevel = priceLevelMap[budget]
-          const radiusM = distanceMap[distance]
           const filtered = allPlaces.filter((p: Place) => {
             if (p.businessStatus === "CLOSED_PERMANENTLY") return false
             if (!p.priceLevel || p.priceLevel === "PRICE_LEVEL_UNSPECIFIED") return true
@@ -153,9 +141,6 @@ export default function Filter() {
               "PRICE_LEVEL_VERY_EXPENSIVE"
             ]
             return levels.indexOf(p.priceLevel) <= maxLevel
-          }).filter((p: Place) => {
-            if (!p.location) return true
-            return getDistanceM(latitude, longitude, p.location.latitude, p.location.longitude) <= radiusM
           })
           if (filtered.length === 0) {
             setError("No places found nearby. Try a wider distance or different filter.")

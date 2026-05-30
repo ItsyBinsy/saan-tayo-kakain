@@ -82,6 +82,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         textQuery,
         maxResultCount: MAX_PLACES,
+        rankPreference: "DISTANCE",
         ...(hasCoords && {
           locationBias: {
             circle: { center: { latitude, longitude }, radius: typeof radius === "number" && radius > 0 ? radius : 500 },

@@ -24,13 +24,18 @@ export const LONG_PLACES: Place[] = [
   { displayName: { text: "Greenwich Pizza Espana Mall Branch" }, formattedAddress: "654 Padre Faura, Manila", location: { latitude: 14.595, longitude: 120.981 }, priceLevel: "PRICE_LEVEL_MODERATE" },
 ]
 
-// No location or priceLevel — triggers "Tara na doon!" fallback on winner screen
+export const ONE_PLACE: Place[] = [SHORT_PLACES[0]]
+export const TWO_PLACES: Place[] = SHORT_PLACES.slice(0, 2)
+export const THREE_PLACES: Place[] = SHORT_PLACES.slice(0, 3)
+export const FOUR_PLACES: Place[] = SHORT_PLACES.slice(0, 4)
+
+// No priceLevel — but valid Manila coords so Haversine doesn't filter them out
 export const NO_DETAIL_PLACES: Place[] = [
-  { displayName: { text: "Mystery Cafe" }, formattedAddress: "Somewhere, Manila", location: { latitude: 0, longitude: 0 } },
-  { displayName: { text: "Ghost Kitchen" }, formattedAddress: "Nowhere, Manila", location: { latitude: 0, longitude: 0 } },
-  { displayName: { text: "Void Resto" }, formattedAddress: "Void, Manila", location: { latitude: 0, longitude: 0 } },
-  { displayName: { text: "Blank Eats" }, formattedAddress: "Blank, Manila", location: { latitude: 0, longitude: 0 } },
-  { displayName: { text: "No Name" }, formattedAddress: "Unknown, Manila", location: { latitude: 0, longitude: 0 } },
+  { displayName: { text: "Mystery Cafe" }, formattedAddress: "Somewhere, Manila", location: { latitude: 14.598, longitude: 120.984 } },
+  { displayName: { text: "Ghost Kitchen" }, formattedAddress: "Nowhere, Manila", location: { latitude: 14.599, longitude: 120.985 } },
+  { displayName: { text: "Void Resto" }, formattedAddress: "Void, Manila", location: { latitude: 14.596, longitude: 120.982 } },
+  { displayName: { text: "Blank Eats" }, formattedAddress: "Blank, Manila", location: { latitude: 14.595, longitude: 120.981 } },
+  { displayName: { text: "No Name" }, formattedAddress: "Unknown, Manila", location: { latitude: 14.597, longitude: 120.983 } },
 ]
 
 type Fixtures = {

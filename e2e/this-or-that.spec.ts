@@ -1,4 +1,4 @@
-import { test, expect, SHORT_PLACES, LONG_PLACES } from "./fixtures"
+import { test, expect, SHORT_PLACES, LONG_PLACES, TWO_PLACES } from "./fixtures"
 
 test.describe("This or That", () => {
   test("shows Option A/B cards and round label", async ({ page, loadApp, goToMode }) => {
@@ -15,14 +15,16 @@ test.describe("This or That", () => {
     await loadApp(SHORT_PLACES)
     await goToMode("this-or-that")
 
+    await expect(page.getByText("Option A")).toBeVisible()
+
     const viewport = page.viewportSize()!
-    const buttons = page.locator("button")
-    const count = await buttons.count()
+    const cards = page.locator("button:has-text('Option')")
+    const count = await cards.count()
 
     for (let i = 0; i < count; i++) {
-      const box = await buttons.nth(i).boundingBox()
+      const box = await cards.nth(i).boundingBox()
       if (box) {
-        expect(box.x + box.width, `Button ${i} overflows viewport`).toBeLessThanOrEqual(viewport.width + 2)
+        expect(box.x + box.width, `Card ${i} overflows viewport`).toBeLessThanOrEqual(viewport.width + 2)
       }
     }
   })
@@ -34,13 +36,13 @@ test.describe("This or That", () => {
     await expect(page.getByText("Option A")).toBeVisible()
 
     const viewport = page.viewportSize()!
-    const buttons = page.locator("button")
-    const count = await buttons.count()
+    const cards = page.locator("button:has-text('Option')")
+    const count = await cards.count()
 
     for (let i = 0; i < count; i++) {
-      const box = await buttons.nth(i).boundingBox()
+      const box = await cards.nth(i).boundingBox()
       if (box) {
-        expect(box.x + box.width, `Button ${i} overflows viewport with long name`).toBeLessThanOrEqual(viewport.width + 2)
+        expect(box.x + box.width, `Card ${i} overflows viewport with long name`).toBeLessThanOrEqual(viewport.width + 2)
       }
     }
   })
@@ -56,7 +58,16 @@ test.describe("This or That", () => {
       await page.waitForTimeout(300)
     }
 
-    await expect(page).toHaveURL(/\/winner/)
+    await page.waitForURL("**/winner", { timeout: 12000 })
+    await expect(page.locator("h1")).not.toBeEmpty()
+  })
+
+  test("2 places: shows Round 1 of 1 and one pick ends the game", async ({ page, loadApp, goToMode }) => {
+    await loadApp(TWO_PLACES)
+    await goToMode("this-or-that")
+    await expect(page.getByText("Round 1 of 1")).toBeVisible()
+    await page.locator("button").first().click()
+    await page.waitForURL("**/winner", { timeout: 12000 })
     await expect(page.locator("h1")).not.toBeEmpty()
   })
 

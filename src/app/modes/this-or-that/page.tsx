@@ -88,7 +88,7 @@ export default function ThisOrThat() {
             letterSpacing: "0.12em",
           }}
         >
-          Round {round} of 4
+          Round {round} of {candidates.length - 1}
         </p>
         <h1
           style={{

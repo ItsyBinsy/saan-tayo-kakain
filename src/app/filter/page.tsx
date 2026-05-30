@@ -158,7 +158,7 @@ export default function Filter() {
             return getDistanceM(latitude, longitude, p.location.latitude, p.location.longitude) <= radiusM
           })
           if (filtered.length === 0) {
-            setError("No places found. Try a different filter.")
+            setError("No places found nearby. Try a wider distance or different filter.")
             setLoading(false)
             return
           }

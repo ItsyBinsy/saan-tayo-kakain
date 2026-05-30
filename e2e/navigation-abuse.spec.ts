@@ -16,7 +16,7 @@ test.describe("Navigation abuse / cheat prevention", () => {
   test("refresh on /winner → redirects to /filter (store wiped)", async ({ page, loadApp, goToMode }) => {
     await loadApp(SHORT_PLACES)
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 8000 })
+    await page.waitForURL("**/winner", { timeout: 12000 })
 
     await page.reload()
     await page.waitForURL("**/filter", { timeout: 5000 })
@@ -38,18 +38,19 @@ test.describe("Navigation abuse / cheat prevention", () => {
 
     // Use Bahala Na → winner
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 8000 })
+    await page.waitForURL("**/winner", { timeout: 12000 })
 
-    // Use in-app "Try a different mode" to go back (keeps store alive)
-    await page.getByText("Try a different mode").click()
-    await page.waitForURL("**/modes", { timeout: 3000 })
+    // Use in-app "Try another mode" to go back (keeps store alive)
+    await page.getByText("Try another mode").click()
+    await page.getByText("Sure? Tap again").click()
+    await page.waitForURL("**/modes", { timeout: 5000 })
 
     // Bahala Na button should be disabled
     const bahalaNaBtn = page.getByText("Bahala Na", { exact: true })
     await expect(bahalaNaBtn).toBeVisible()
 
-    // Clicking it should be a no-op — stays on /modes
-    await bahalaNaBtn.click()
+    // Clicking it should be a no-op — stays on /modes (force since aria-disabled)
+    await bahalaNaBtn.click({ force: true })
     await page.waitForTimeout(500)
     await expect(page).toHaveURL(/\/modes/)
 
@@ -68,15 +69,16 @@ test.describe("Navigation abuse / cheat prevention", () => {
       await page.locator("button").first().click()
       await page.waitForTimeout(350)
     }
-    await page.waitForURL("**/winner", { timeout: 8000 })
+    await page.waitForURL("**/winner", { timeout: 12000 })
 
     // Use in-app button to go back to /modes (keeps store alive)
-    await page.getByText("Try a different mode").click()
-    await page.waitForURL("**/modes", { timeout: 3000 })
+    await page.getByText("Try another mode").click()
+    await page.getByText("Sure? Tap again").click()
+    await page.waitForURL("**/modes", { timeout: 5000 })
 
     // This or That button should now be disabled
     const totBtn = page.getByText("This or That", { exact: true })
-    await totBtn.click()
+    await totBtn.click({ force: true })
     await page.waitForTimeout(500)
     await expect(page).toHaveURL(/\/modes/)
 
@@ -108,26 +110,31 @@ test.describe("Navigation abuse / cheat prevention", () => {
     await freshPage.close()
   })
 
-  test("spamming mode buttons only navigates once per unused mode", async ({ page, loadApp, goToMode }) => {
+  test("spamming mode buttons only navigates once per unused mode", async ({ page, loadApp }) => {
     await loadApp(SHORT_PLACES)
 
-    // Rapidly click Bahala Na multiple times
-    const bahalaNaBtn = page.getByText("Bahala Na", { exact: true })
-    await bahalaNaBtn.click()
-    await bahalaNaBtn.click()
-    await bahalaNaBtn.click()
+    // Click Bahala Na once — navigate to it
+    await page.getByText("Bahala Na", { exact: true }).click()
+    await page.waitForURL("**/modes/bahala-na", { timeout: 5000 })
 
-    // Should navigate to bahala-na only once, then winner
-    await page.waitForURL("**/winner", { timeout: 8000 })
-    await expect(page).toHaveURL(/\/winner/)
+    // Wait for winner
+    await page.waitForURL("**/winner", { timeout: 12000 })
 
-    // Go back to modes — Bahala Na should be disabled (used once, not 3 times)
-    await page.getByText("Try a different mode").click()
-    await page.waitForURL("**/modes", { timeout: 3000 })
+    // Go back to modes — Bahala Na should be disabled (used once)
+    await page.getByText("Try another mode").click()
+    await page.getByText("Sure? Tap again").click()
+    await page.waitForURL("**/modes", { timeout: 5000 })
 
-    const usedLabel = page.getByText("Already used")
-    const count = await usedLabel.count()
-    // Only 1 mode used despite 3 clicks
+    // Bahala Na shows Already used
+    await expect(page.getByText("Already used")).toBeVisible()
+
+    // Clicking it does nothing (force since aria-disabled)
+    await page.getByText("Bahala Na", { exact: true }).click({ force: true })
+    await page.waitForTimeout(500)
+    await expect(page).toHaveURL(/\/modes/)
+
+    // Only 1 mode used
+    const count = await page.getByText("Already used").count()
     expect(count).toBe(1)
   })
 

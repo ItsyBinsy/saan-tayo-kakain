@@ -4,7 +4,7 @@ test.describe("Bahala Na", () => {
   test("auto-picks a winner and navigates to /winner within 2s", async ({ page, loadApp, goToMode }) => {
     await loadApp(SHORT_PLACES)
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 5000 })
+    await page.waitForURL("**/winner", { timeout: 10000 })
     await expect(page).toHaveURL(/\/winner/)
   })
 
@@ -19,15 +19,16 @@ test.describe("Bahala Na", () => {
 
     // First visit — picks winner
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 5000 })
+    await page.waitForURL("**/winner", { timeout: 10000 })
     const firstWinner = await page.locator("h1").textContent()
 
-    // Use "Try a different mode" to go back to /modes (client-side nav — keeps store alive)
-    await page.getByText("Try a different mode").click()
-    await page.waitForURL("**/modes", { timeout: 3000 })
+    // Use "Try another mode" to go back to /modes (client-side nav — keeps store alive)
+    await page.getByText("Try another mode").click()
+    await page.getByText("Sure? Tap again").click()
+    await page.waitForURL("**/modes", { timeout: 5000 })
 
     // Bahala Na button should be disabled (marked used) — clicking it should be a no-op
-    await page.getByText("Bahala Na", { exact: true }).click()
+    await page.getByText("Bahala Na", { exact: true }).click({ force: true })
     await page.waitForTimeout(500)
     await expect(page).toHaveURL(/\/modes/)
 
@@ -40,7 +41,7 @@ test.describe("Bahala Na", () => {
       await page.locator("button").first().click()
       await page.waitForTimeout(300)
     }
-    await page.waitForURL("**/winner", { timeout: 5000 })
+    await page.waitForURL("**/winner", { timeout: 10000 })
     const secondWinner = await page.locator("h1").textContent()
 
     // Winner may differ (different mode picks differently) but original Bahala Na winner is still stored

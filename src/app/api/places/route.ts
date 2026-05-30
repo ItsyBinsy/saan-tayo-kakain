@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
         textQuery,
         maxResultCount: MAX_PLACES,
         ...(hasCoords && {
-          locationRestriction: {
+          locationBias: {
             circle: { center: { latitude, longitude }, radius: typeof radius === "number" && radius > 0 ? radius : 500 },
           },
         }),

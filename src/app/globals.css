@@ -153,6 +153,12 @@ body {
   height: 100%;
 }
 
+.filter-divider {
+  width: 1.5px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
 /* Modes page layout — full screen on mobile, card on desktop */
 .modes-hero {
   height: 42dvh;

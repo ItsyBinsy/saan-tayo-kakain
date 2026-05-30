@@ -18,7 +18,7 @@ export default function Filter() {
   }, [router])
   const [mealType, setMealType] = useState("All")
   const [budget, setBudget] = useState("Any")
-  const [distance, setDistance] = useState("Walking distance")
+  const [distance, setDistance] = useState("Wider")
   const setPlaces = useStore((state) => state.setPlaces)
   const resetModes = useStore((state) => state.resetModes)
   const [loading, setLoading] = useState(false)
@@ -37,16 +37,14 @@ export default function Filter() {
   }
 
   const distanceMap: Record<string, number> = {
-    "Around me":        300,
-    "Walking distance": 800,
-    "Short ride":       2000,
+    "Nearby": 200,
+    "Wider":  1500,
   }
 
   const priceLevelMap: Record<string, number> = {
     "Any":  Infinity,
     "₱100": 1,
     "₱200": 2,
-    "₱300": 3,
   }
 
   const mealTypes = [
@@ -132,6 +130,7 @@ export default function Filter() {
           const maxLevel = priceLevelMap[budget]
           const filtered = allPlaces.filter((p: Place) => {
             if (p.businessStatus === "CLOSED_PERMANENTLY") return false
+            if (p.regularOpeningHours?.openNow === false) return false
             if (!p.priceLevel || p.priceLevel === "PRICE_LEVEL_UNSPECIFIED") return true
             const levels = [
               "PRICE_LEVEL_FREE",
@@ -413,90 +412,94 @@ export default function Filter() {
         })}
       </div>
 
-      {/* Distance row */}
+      {/* Distance + Budget row */}
       <div
-        className="flex items-center gap-2 px-4 py-3"
+        className="flex items-stretch"
         style={{ borderTop: "2px solid var(--border)", flexShrink: 0 }}
       >
-        <div className="flex flex-col" style={{ marginRight: "4px", flexShrink: 0 }}>
-          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "15px", color: "var(--text-main)", lineHeight: 1.1 }}>
-            Distance
-          </span>
-        </div>
-        {["Around me", "Walking distance", "Short ride"].map((item) => {
-          const isSelected = distance === item
-          return (
-            <button
-              key={item}
-              onClick={() => setDistance(item)}
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "11px",
-                fontWeight: 600,
-                borderRadius: "4px",
-                border: "1.5px solid var(--border)",
-                background: isSelected ? "var(--brand)" : "transparent",
-                color: isSelected ? "var(--white)" : "var(--text-main)",
-                padding: "4px 10px",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {item}
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Budget row */}
-      <div
-        className="flex items-center gap-2 px-4 py-3"
-        style={{
-          borderTop: "2px solid var(--border)",
-          flexShrink: 0,
-        }}
-      >
-        <div className="flex flex-col" style={{ marginRight: "4px", flexShrink: 0 }}>
+        {/* Distance half */}
+        <div className="flex items-center gap-2 px-3 py-3" style={{ width: "50%" }}>
           <span style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
-            fontSize: "15px",
+            fontSize: "13px",
             color: "var(--text-main)",
-            lineHeight: 1.1,
+            flexShrink: 0,
           }}>
-            Budget
+            Distance
           </span>
-          <span style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "9px",
-            color: "var(--text-muted)",
-            lineHeight: 1,
-          }}>
-            per person
-          </span>
+          {["Nearby", "Wider"].map((item) => {
+            const isSelected = distance === item
+            return (
+              <button
+                key={item}
+                onClick={() => setDistance(item)}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "clamp(9px, 2.5cqw, 11px)",
+                  fontWeight: 600,
+                  borderRadius: "4px",
+                  border: "1.5px solid var(--border)",
+                  background: isSelected ? "var(--brand)" : "transparent",
+                  color: isSelected ? "var(--white)" : "var(--text-main)",
+                  padding: "3px clamp(5px, 1.5cqw, 10px)",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {item}
+              </button>
+            )
+          })}
         </div>
-        {["Any", "₱100", "₱200", "₱300"].map((item) => {
-          const isSelected = budget === item
-          return (
-            <button
-              key={item}
-              onClick={() => setBudget(item)}
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "11px",
-                fontWeight: 600,
-                borderRadius: "4px",
-                border: "1.5px solid var(--border)",
-                background: isSelected ? "var(--brand)" : "transparent",
-                color: isSelected ? "var(--white)" : "var(--text-main)",
-                padding: "4px 10px",
-                cursor: "pointer",
-              }}
-            >
-              {item}
-            </button>
-          )
-        })}
+
+        {/* Divider */}
+        <div className="filter-divider" />
+
+        {/* Budget half */}
+        <div className="flex items-center gap-2 px-3 py-3" style={{ width: "50%" }}>
+          <div className="flex flex-col" style={{ flexShrink: 0 }}>
+            <span style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: "13px",
+              color: "var(--text-main)",
+              lineHeight: 1.1,
+            }}>
+              Budget
+            </span>
+            <span style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "9px",
+              color: "var(--text-muted)",
+              lineHeight: 1,
+            }}>
+              /person
+            </span>
+          </div>
+          {["Any", "₱100", "₱200"].map((item) => {
+            const isSelected = budget === item
+            return (
+              <button
+                key={item}
+                onClick={() => setBudget(item)}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "clamp(9px, 2.5cqw, 11px)",
+                  fontWeight: 600,
+                  borderRadius: "4px",
+                  border: "1.5px solid var(--border)",
+                  background: isSelected ? "var(--brand)" : "transparent",
+                  color: isSelected ? "var(--white)" : "var(--text-main)",
+                  padding: "3px clamp(5px, 1.5cqw, 10px)",
+                  cursor: "pointer",
+                }}
+              >
+                {item}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Error */}

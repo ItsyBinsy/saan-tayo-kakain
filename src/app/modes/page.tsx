@@ -104,18 +104,20 @@ export default function Modes() {
       >
         {modes.map((mode, index) => {
           const isUsed = usedModes.includes(mode.id)
+          const isUnavailable = (mode.id === "this-or-that" || mode.id === "paikutin") && places.length < 2
+          const isDisabled = isUsed || isUnavailable
           return (
             <button
               key={mode.id}
-              onClick={() => !isUsed && router.push(`/modes/${mode.id}`)}
-              aria-disabled={isUsed}
-              aria-label={isUsed ? `${mode.name} — already used` : mode.name}
+              onClick={() => !isDisabled && router.push(`/modes/${mode.id}`)}
+              aria-disabled={isDisabled}
+              aria-label={isUsed ? `${mode.name} — already used` : isUnavailable ? `${mode.name} — needs at least 2 places` : mode.name}
               className="w-full flex items-center justify-between px-6"
               style={{
                 borderBottom: index < 2 ? "1.5px solid var(--border)" : "none",
                 background: "transparent",
-                cursor: isUsed ? "not-allowed" : "pointer",
-                opacity: isUsed ? 0.35 : 1,
+                cursor: isDisabled ? "not-allowed" : "pointer",
+                opacity: isDisabled ? 0.35 : 1,
                 flex: 1,
               }}
             >
@@ -137,11 +139,11 @@ export default function Modes() {
                   style={{
                     fontFamily: "var(--font-body)",
                     fontSize: "clamp(12px, 3cqw, 14px)",
-                    color: isUsed ? "var(--text-muted)" : "#9C8060",
+                    color: isDisabled ? "var(--text-muted)" : "#9C8060",
                     marginTop: "4px",
                   }}
                 >
-                  {isUsed ? "Already used" : mode.sub}
+                  {isUsed ? "Already used" : isUnavailable ? "Needs 2+ places" : mode.sub}
                 </span>
               </div>
               <span

@@ -433,7 +433,6 @@ export default function Filter() {
                 style={{
                   alignSelf: "flex-end",
                   objectFit: "contain",
-                  ...(item.label === "Snacks" ? { transform: "scale(0.75)" } : {}),
                 }}
               />
             </button>

@@ -33,7 +33,7 @@ export default function BahalaNa() {
     <LoadingScreen
       animationData={bahalaNaAnim}
       message="Picking one for you..."
-      sub="Huwag kang magreklamo ha."
+      sub="Huwag sana itong ayaw mo."
       indicator="dots"
     />
   )

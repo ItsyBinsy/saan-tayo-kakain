@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import LoadingScreen from "@/components/LoadingScreen"
 import afterThisOrThatAnim from "@/animations/after-this-or-that.json"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function ThisOrThat() {
   const router = useRouter()
@@ -19,26 +20,41 @@ export default function ThisOrThat() {
   const [right, setRight] = useState(candidates[1])
   const [round, setRound] = useState(1)
   const [showLoading, setShowLoading] = useState(false)
+  const [picked, setPicked] = useState<"left" | "right" | null>(null)
+  const [animating, setAnimating] = useState(false)
 
   useEffect(() => {
     if (candidates.length < 2) router.replace("/filter")
     else if (!showLoading && usedModes.includes("this-or-that")) router.replace("/winner")
   }, [candidates.length, usedModes, showLoading, router])
 
-  const handlePick = (winner: typeof candidates[0]) => {
-    const newRemaining = remaining.filter((p) => p !== left && p !== right)
-    if (newRemaining.length === 0) {
-      setWinner(winner)
-      addUsedMode("this-or-that")
-      setShowLoading(true)
-      setTimeout(() => router.push("/winner"), 6000)
-      return
-    }
-    const nextRight = newRemaining[0]
-    setRemaining(newRemaining.slice(1))
-    setLeft(winner)
-    setRight(nextRight)
-    setRound(round + 1)
+  const handlePick = (side: "left" | "right") => {
+    if (animating) return
+    const winner = side === "left" ? left : right
+    setPicked(side)
+    setAnimating(true)
+
+    setTimeout(() => {
+      const newRemaining = remaining.filter((p) => p !== left && p !== right)
+      setPicked(null)
+      setAnimating(false)
+
+      if (newRemaining.length === 0) {
+        setWinner(winner)
+        setShowLoading(true)
+        setTimeout(() => {
+          addUsedMode("this-or-that")
+          router.push("/winner")
+        }, 6000)
+        return
+      }
+
+      const nextRight = newRemaining[0]
+      setRemaining(newRemaining.slice(1))
+      setLeft(winner)
+      setRight(nextRight)
+      setRound(r => r + 1)
+    }, 420)
   }
 
   if (showLoading) {
@@ -74,7 +90,7 @@ export default function ThisOrThat() {
       <div
         className="flex flex-col justify-end px-5 pb-5"
         style={{
-          height: "42dvh",
+          height: "30dvh",
           flexShrink: 0,
           paddingTop: "calc(env(safe-area-inset-top) + 20px)",
         }}
@@ -116,17 +132,27 @@ export default function ThisOrThat() {
         }}
       >
         {/* Option A */}
-        <button
-          onClick={() => handlePick(left)}
+        <motion.button
+          onClick={() => handlePick("left")}
           className="flex flex-col text-left"
           style={{
             background: "var(--surface)",
             borderRight: "1px solid var(--border)",
             padding: "20px 16px",
-            cursor: "pointer",
+            cursor: animating ? "default" : "pointer",
             overflow: "hidden",
             justifyContent: "space-between",
+            originY: 1,
           }}
+          animate={
+            picked === "right"
+              ? { y: "105%", opacity: 0 }
+              : picked === "left"
+              ? { scale: 1.03 }
+              : { y: 0, opacity: 1, scale: 1 }
+          }
+          transition={{ duration: 0.35, ease: "easeIn" }}
+          whileTap={animating ? {} : { scale: 0.97 }}
         >
           <p
             className="uppercase tracking-widest"
@@ -154,19 +180,29 @@ export default function ThisOrThat() {
           >
             {left?.displayName.text}
           </p>
-        </button>
+        </motion.button>
 
         {/* Option B */}
-        <button
-          onClick={() => handlePick(right)}
+        <motion.button
+          onClick={() => handlePick("right")}
           className="flex flex-col text-left"
           style={{
             background: "var(--surface)",
             padding: "20px 16px",
-            cursor: "pointer",
+            cursor: animating ? "default" : "pointer",
             overflow: "hidden",
             justifyContent: "space-between",
+            originY: 1,
           }}
+          animate={
+            picked === "left"
+              ? { y: "105%", opacity: 0 }
+              : picked === "right"
+              ? { scale: 1.03 }
+              : { y: 0, opacity: 1, scale: 1 }
+          }
+          transition={{ duration: 0.35, ease: "easeIn" }}
+          whileTap={animating ? {} : { scale: 0.97 }}
         >
           <p
             className="uppercase tracking-widest"
@@ -194,7 +230,7 @@ export default function ThisOrThat() {
           >
             {right?.displayName.text}
           </p>
-        </button>
+        </motion.button>
       </div>
 
       {/* Bottom hint */}
@@ -208,15 +244,22 @@ export default function ThisOrThat() {
           paddingBottom: "calc(12px + env(safe-area-inset-bottom))",
         }}
       >
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "12px",
-            color: "var(--text-muted)",
-          }}
-        >
-          Tap to pick · loser is eliminated
-        </p>
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={animating ? "eliminating" : "idle"}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "12px",
+              color: "var(--text-muted)",
+            }}
+          >
+            {animating ? "Eliminated." : "Tap to pick · loser is eliminated"}
+          </motion.p>
+        </AnimatePresence>
       </div>
     </main>
   )

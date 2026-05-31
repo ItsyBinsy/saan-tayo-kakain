@@ -6,9 +6,9 @@ import { useStore } from "@/store"
 import dynamic from "next/dynamic"
 import LoadingScreen from "@/components/LoadingScreen"
 import afterPaikutinAnim from "@/animations/after-paikutin.json"
+import { motion, AnimatePresence } from "framer-motion"
 
 const Wheel = dynamic(() => import("react-custom-roulette").then(m => m.Wheel), { ssr: false })
-
 
 export default function Paikutin() {
   const router = useRouter()
@@ -20,6 +20,9 @@ export default function Paikutin() {
   const [spinning, setSpinning] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
   const [showLoading, setShowLoading] = useState(false)
+  const [hasSpun, setHasSpun] = useState(false)
+  const [stopping, setStopping] = useState(false)
+  const [winnerName, setWinnerName] = useState<string | null>(null)
 
   useEffect(() => {
     if (places.length === 0) router.replace("/filter")
@@ -34,26 +37,35 @@ export default function Paikutin() {
   }))
 
   const spinWheel = () => {
-    if (spinning) return
+    if (spinning || stopping) return
     const winner = Math.floor(Math.random() * places.length)
     setPrizeNumber(winner)
     setSpinning(true)
+    setHasSpun(true)
+    setWinnerName(null)
   }
 
   const handleStop = () => {
     setSpinning(false)
+    setStopping(true)
+    setWinnerName(places[prizeNumber].displayName.text)
     setWinner(places[prizeNumber])
-    addUsedMode("paikutin")
-    setShowLoading(true)
-    setTimeout(() => router.push("/winner"), 6000)
+
+    setTimeout(() => {
+      setShowLoading(true)
+      setTimeout(() => {
+        addUsedMode("paikutin")
+        router.push("/winner")
+      }, 6000)
+    }, 1800)
   }
 
   if (showLoading) {
     return (
       <LoadingScreen
         animationData={afterPaikutinAnim}
-        message="And the winner is..."
-        sub="Wag sana itong ayaw mo."
+        message="No more going in circles."
+        sub="Huwag kang magreklamo."
         indicator="bar"
       />
     )
@@ -84,7 +96,7 @@ export default function Paikutin() {
       }}
       onClick={spinWheel}
     >
-      {/* Title — small, above the wheel */}
+      {/* Title */}
       <div className="w-full px-5 mb-4" style={{ flexShrink: 0 }}>
         <h1
           style={{
@@ -98,28 +110,56 @@ export default function Paikutin() {
         >
           Paikutin
         </h1>
-        <p
-          className="mt-1"
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "12px",
-            color: "var(--text-muted)",
-          }}
-        >
-          {places.length} candidates · {spinning ? "spinning..." : "tap anywhere to spin"}
-        </p>
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={stopping ? "winner" : spinning ? "spinning" : "idle"}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="mt-1"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "12px",
+              color: stopping ? "var(--brand)" : "var(--text-muted)",
+              fontWeight: stopping ? 700 : 400,
+            }}
+          >
+            {stopping && winnerName
+              ? `It's ${winnerName}!`
+              : spinning
+              ? `${places.length} candidates · spinning...`
+              : `${places.length} candidates`}
+          </motion.p>
+        </AnimatePresence>
       </div>
 
-      {/* Wheel — hero element, takes remaining space */}
+      {/* Wheel + pointer together */}
       <div
         className="flex flex-col items-center justify-center"
         style={{
           flex: 1,
           minHeight: 0,
           width: "100%",
-          cursor: spinning ? "default" : "pointer",
+          cursor: spinning || stopping ? "default" : "pointer",
         }}
       >
+        {/* Pointer — sits just above the wheel, always adjacent */}
+        <motion.div
+          initial={{ y: -6, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+          style={{
+            width: 0,
+            height: 0,
+            borderLeft: "10px solid transparent",
+            borderRight: "10px solid transparent",
+            borderTop: "18px solid var(--brand)",
+            marginBottom: "6px",
+            flexShrink: 0,
+            filter: "drop-shadow(0 2px 4px rgba(196,30,58,0.4))",
+          }}
+        />
         <div style={{
           filter: "drop-shadow(0px 8px 24px rgba(26,18,8,0.22)) drop-shadow(0px 2px 6px rgba(196,30,58,0.18))",
           borderRadius: "50%",
@@ -148,13 +188,42 @@ export default function Paikutin() {
             radiusLineWidth={1}
             fontSize={10}
             fontWeight={700}
-            pointerProps={{
-              style: { display: "none" },
-            }}
+            pointerProps={{ style: { display: "none" } }}
           />
         </div>
       </div>
+
+      {/* Pre-spin CTA hint — only before first spin */}
+      <AnimatePresence>
+        {!hasSpun && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.25 }}
+            style={{
+              flexShrink: 0,
+              borderTop: "2px solid var(--border)",
+              width: "100%",
+              padding: "16px",
+              paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
+              background: "var(--surface)",
+              textAlign: "center",
+              pointerEvents: "none",
+            }}
+          >
+            <p style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: "clamp(18px, 5cqw, 22px)",
+              color: "var(--text-main)",
+              letterSpacing: "0.3px",
+            }}>
+              Tap anywhere to spin →
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   )
-
 }

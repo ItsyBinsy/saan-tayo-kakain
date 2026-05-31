@@ -8,13 +8,16 @@ import { useRouter } from "next/navigation"
 import { useStore, type Place } from "@/store"
 import LoadingScreen from "@/components/LoadingScreen"
 import findingPlacesAnim from "@/animations/finding-places.json"
+import Onboarding, { shouldShowOnboarding } from "@/components/Onboarding"
 
 
 export default function Filter() {
   const router = useRouter()
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   useEffect(() => {
     router.prefetch("/modes")
+    if (shouldShowOnboarding()) setShowOnboarding(true)
   }, [router])
   const [mealType, setMealType] = useState("All")
   const [budget, setBudget] = useState("Any")
@@ -315,6 +318,7 @@ export default function Filter() {
 
   return (
     <PageTransition>
+      {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       <main
       className="flex flex-col"
       style={{

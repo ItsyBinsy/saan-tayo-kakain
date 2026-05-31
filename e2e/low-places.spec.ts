@@ -2,11 +2,9 @@
 import { test, expect, ONE_PLACE, TWO_PLACES, THREE_PLACES, FOUR_PLACES } from "./fixtures"
 
 test.describe("Paikutin — low place counts", () => {
-  test("1 place: wheel page renders with correct candidate count", async ({ page, loadApp, goToMode }) => {
+  test("1 place: paikutin is disabled on modes screen", async ({ page, loadApp }) => {
     await loadApp(ONE_PLACE)
-    await goToMode("paikutin")
-    await expect(page.getByText("1 candidates")).toBeVisible()
-    await expect(page.getByText("Paikutin")).toBeVisible()
+    await expect(page.getByText("Needs 2+ places").first()).toBeVisible()
   })
 
   test("2 places: wheel page renders with correct candidate count", async ({ page, loadApp, goToMode }) => {
@@ -55,5 +53,19 @@ test.describe("Bahala Na — low place counts", () => {
     await goToMode("bahala-na")
     await page.waitForURL("**/winner", { timeout: 10000 })
     await expect(page.locator("h1")).not.toBeEmpty()
+  })
+
+  test("1 place: after Bahala Na used, back to /modes redirects to /winner (all modes disabled)", async ({ page, loadApp, goToMode }) => {
+    await loadApp(ONE_PLACE)
+    await goToMode("bahala-na")
+    await page.waitForURL("**/winner", { timeout: 10000 })
+
+    // Go back to modes via in-app button
+    await page.getByText("Try another mode").click()
+    await page.getByText("Sure? Tap again").click()
+
+    // Should redirect straight to /winner — all modes are disabled
+    await page.waitForURL("**/winner", { timeout: 5000 })
+    await expect(page).toHaveURL(/\/winner/)
   })
 })

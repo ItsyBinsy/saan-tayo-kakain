@@ -64,6 +64,13 @@ export const test = base.extend<Fixtures>({
         })
       )
       await page.goto("/filter")
+      await page.waitForTimeout(400)
+      const onboardingVisible = await page.getByText("Skip").isVisible().catch(() => false)
+      if (onboardingVisible) {
+        await page.getByText("Skip").click()
+        await page.waitForTimeout(300)
+      }
+      await page.evaluate(() => localStorage.setItem("onboarding_seen", "1"))
       await page.getByText("Find places →").click()
       // Store is now populated — we're at /modes
       await page.waitForURL("**/modes", { timeout: 10000 })

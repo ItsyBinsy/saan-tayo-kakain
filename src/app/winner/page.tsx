@@ -143,7 +143,7 @@ export default function Winner() {
     {
       icon: <Clock size={15} strokeWidth={2} aria-hidden />,
       label: openStatus ?? "Hours not available",
-      sub: todayHours ?? (!openStatus ? "No hours listed. Call ahead or check online." : undefined),
+      sub: todayHours ?? (!openStatus ? "Call ahead or check online." : undefined),
       accent: !!openStatus && !openNow,
       muted: !openStatus,
     },

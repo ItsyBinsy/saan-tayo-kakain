@@ -30,12 +30,20 @@ const cards: { headline: React.ReactNode; body: string; note: string | null }[] 
 
 export function shouldShowOnboarding(): boolean {
   if (typeof window === "undefined") return false
-  return !localStorage.getItem(STORAGE_KEY)
+  try {
+    return !localStorage.getItem(STORAGE_KEY)
+  } catch {
+    return true
+  }
 }
 
 export function markOnboardingSeen() {
   if (typeof window === "undefined") return
-  localStorage.setItem(STORAGE_KEY, "1")
+  try {
+    localStorage.setItem(STORAGE_KEY, "1")
+  } catch {
+    // silently fail — user will just see onboarding again next time
+  }
 }
 
 export default function Onboarding({ onDone }: { onDone: () => void }) {

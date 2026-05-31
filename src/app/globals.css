@@ -141,6 +141,7 @@ button:active, a:active {
 
 html {
   height: 100%;
+  overscroll-behavior: none;
 }
 
 body {

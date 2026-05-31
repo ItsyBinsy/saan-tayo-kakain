@@ -8,12 +8,12 @@ const MAX_PLACES = 10
 
 // nearbySearch uses includedTypes (Google place type codes)
 const CATEGORY_TYPES: Record<string, string[]> = {
-  "All":        ["restaurant", "cafe", "food_court", "fast_food_restaurant", "meal_takeaway", "meal_delivery", "buffet_restaurant", "family_restaurant", "diner", "cafeteria"],
-  "Rice meal":  ["restaurant", "food_court", "meal_takeaway", "filipino_restaurant", "soup_restaurant"],
+  "All":        ["restaurant", "cafe", "food_court", "fast_food_restaurant", "meal_takeaway", "meal_delivery"],
+  "Rice meal":  ["restaurant", "food_court", "meal_takeaway", "filipino_restaurant"],
   "Fast food":  ["fast_food_restaurant", "hamburger_restaurant", "meal_takeaway", "meal_delivery", "chicken_restaurant", "pizza_restaurant", "sandwich_shop"],
-  "Snacks":     ["bakery", "cafe", "sandwich_shop", "snack_bar", "donut_shop", "bread_shop", "breakfast_restaurant"],
-  "Dessert":    ["dessert_shop", "ice_cream_shop", "chocolate_shop", "candy_store", "pastry_shop", "dessert_restaurant", "cake_shop", "acai_shop"],
-  "Drinks":     ["cafe", "juice_shop", "tea_house", "coffee_shop", "coffee_roastery", "coffee_stand"],
+  "Snacks":     ["bakery", "cafe", "sandwich_shop", "donut_shop"],
+  "Dessert":    ["dessert_shop", "ice_cream_shop", "chocolate_shop", "candy_store"],
+  "Drinks":     ["cafe", "tea_house", "coffee_shop"],
 }
 
 // searchText fallback (manual location) — still uses text queries

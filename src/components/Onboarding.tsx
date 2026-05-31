@@ -12,12 +12,12 @@ const cards: { headline: React.ReactNode; body: string; note: string | null }[] 
     note: "Nearby = within 200m.  Wider = within 1.5km.",
   },
   {
-    headline: <>Results depend<br />on Google&nbsp;Maps.</>,
+    headline: <>Powered by<br />Google&nbsp;Maps.</>,
     body: "Open places only. Stores with no listed hours may still show up.",
     note: null,
   },
   {
-    headline: <>Your location<br />stays on your phone.</>,
+    headline: <>Your location<br />stays on your device.</>,
     body: "Your location is used to find food near you. Nothing stored, nothing shared.",
     note: null,
   },

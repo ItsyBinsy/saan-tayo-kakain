@@ -15,15 +15,22 @@ export default function Modes() {
   const navigating = useRef(false)
   const [tappedMode, setTappedMode] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (hydrated && places.length === 0) router.replace("/filter")
-  }, [hydrated, places, router])
-
   const modes = [
     { id: "paikutin", name: "Paikutin", sub: "Spin the wheel" },
     { id: "this-or-that", name: "This or That", sub: "Eliminate one by one" },
     { id: "bahala-na", name: "Bahala Na", sub: "Instant pick" },
   ]
+
+  useEffect(() => {
+    if (!hydrated) return
+    if (places.length === 0) { router.replace("/filter"); return }
+    const allDisabled = modes.every((mode) => {
+      const isUsed = usedModes.includes(mode.id)
+      const isUnavailable = (mode.id === "this-or-that" || mode.id === "paikutin") && places.length < 2
+      return isUsed || isUnavailable
+    })
+    if (allDisabled) router.replace("/winner")
+  }, [hydrated, places, usedModes, router])
 
   if (!hydrated) return (
     <div style={{ background: "var(--surface-dark)", height: "100dvh" }} />

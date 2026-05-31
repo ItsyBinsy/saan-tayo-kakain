@@ -153,6 +153,11 @@ body {
   height: 100%;
 }
 
+.meal-icon {
+  width: clamp(56px, 26cqw, 96px);
+  height: clamp(56px, 26cqw, 96px);
+}
+
 .filter-divider {
   width: 1.5px;
   background: var(--border);

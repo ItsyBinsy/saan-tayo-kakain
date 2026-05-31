@@ -364,6 +364,7 @@ export default function Filter() {
           gridTemplateColumns: "1fr 1fr",
           gridTemplateRows: "1fr 1fr 1fr",
           minHeight: 0,
+          containerType: "inline-size",
         }}
       >
         {mealTypes.map((item, index) => {
@@ -400,9 +401,8 @@ export default function Filter() {
                 src={item.icon}
                 alt=""
                 aria-hidden
+                className="meal-icon"
                 style={{
-                  width: "clamp(56px, 14cqw, 72px)",
-                  height: "clamp(56px, 14cqw, 72px)",
                   alignSelf: "flex-end",
                   objectFit: "contain",
                 }}

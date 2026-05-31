@@ -325,41 +325,36 @@ export default function Filter() {
         background: "var(--surface)",
         height: "100dvh",
         overflow: "hidden",
-        position: "relative",
       }}
     >
-      {/* Help button — absolutely positioned inside main, no layout impact */}
-      <button
-        onClick={() => setShowOnboarding(true)}
-        aria-label="How this works"
-        style={{
-          position: "absolute",
-          top: "calc(16px + env(safe-area-inset-top))",
-          right: "20px",
-          width: "28px",
-          height: "28px",
-          borderRadius: "50%",
-          border: "1.5px solid var(--border)",
-          background: "transparent",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontWeight: 800,
-          fontSize: "14px",
-          color: "var(--text-muted)",
-          zIndex: 10,
-        }}
-      >
-        ?
-      </button>
-
       {/* Header */}
       <div
         className="px-5 pb-4"
         style={{ borderBottom: "2px solid var(--border)", flexShrink: 0, paddingTop: "calc(20px + env(safe-area-inset-top))" }}
       >
+        <div className="flex justify-end" style={{ marginBottom: "4px" }}>
+          <button
+            onClick={() => setShowOnboarding(true)}
+            aria-label="How this works"
+            style={{
+              width: "28px",
+              height: "28px",
+              borderRadius: "50%",
+              border: "1.5px solid var(--border)",
+              background: "transparent",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: "14px",
+              color: "var(--text-muted)",
+            }}
+          >
+            ?
+          </button>
+        </div>
         <h1
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",

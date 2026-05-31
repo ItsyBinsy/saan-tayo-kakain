@@ -21,6 +21,11 @@ const cards: { headline: React.ReactNode; body: string; note: string | null }[] 
     body: "Your location is used to find food near you. Nothing stored, nothing shared.",
     note: null,
   },
+  {
+    headline: <>Add this to your<br />home screen.</>,
+    body: "For the best experience, install it like an app. No App Store needed.",
+    note: "iOS: Share → Add to Home Screen\nAndroid: Menu (⋮) → Install app",
+  },
 ]
 
 export function shouldShowOnboarding(): boolean {
@@ -131,10 +136,11 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   fontFamily: "var(--font-body)",
                   fontSize: "13px",
                   color: "#9A8A72",
-                  lineHeight: 1.5,
+                  lineHeight: 1.8,
                   marginTop: "20px",
                   paddingTop: "16px",
                   borderTop: "1px solid #2E2216",
+                  whiteSpace: "pre-line",
                 }}
               >
                 {card.note}

@@ -22,7 +22,7 @@ const cards: { headline: React.ReactNode; body: string; note: string | null }[] 
     note: null,
   },
   {
-    headline: <>Add this to your<br />home screen.</>,
+    headline: <>Add to your<br />home screen.</>,
     body: "For the best experience, install it like an app. No App Store needed.",
     note: "iOS: Share → Add to Home Screen\nAndroid: Menu (⋮) → Install app",
   },

@@ -1,24 +1,24 @@
 "use client"
 
-import { useState, useRef } from "react"
+import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 const STORAGE_KEY = "onboarding_seen"
 
-const cards = [
+const cards: { headline: React.ReactNode; body: string; note: string | null }[] = [
   {
-    headline: "No more\n\"kahit saan.\"",
-    body: "Tell us where you are, set your vibe, pick a game mode. We handle the rest.",
-    note: "Nearby = 200m.  Wider = 1.5km.",
+    headline: <>No more<br />"kahit saan."</>,
+    body: "Tell me where you are. The universe picks from there.",
+    note: "Nearby = within 200m.  Wider = within 1.5km.",
   },
   {
-    headline: "Results depend\non Google Maps.",
-    body: "Not all places are listed, and some hours aren't updated. Always check before heading out.",
+    headline: <>Results depend<br />on Google&nbsp;Maps.</>,
+    body: "Open places only. Stores with no listed hours may still show up.",
     note: null,
   },
   {
-    headline: "Your location\nstays on your phone.",
-    body: "We only use it to find food near you. Nothing is stored, nothing is shared.",
+    headline: <>Your location<br />stays on your phone.</>,
+    body: "Your location is used to find food near you. Nothing stored, nothing shared.",
     note: null,
   },
 ]
@@ -36,7 +36,6 @@ export function markOnboardingSeen() {
 export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0)
   const [direction, setDirection] = useState(1)
-  const dragStartX = useRef(0)
   const isLast = index === cards.length - 1
 
   function next() {
@@ -73,61 +72,44 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         position: "absolute",
         inset: 0,
         zIndex: 50,
-        background: "var(--surface-dark)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-        paddingTop: "env(safe-area-inset-top)",
-        paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
-      {/* Skip */}
-      <div className="flex justify-end px-5 pt-4" style={{ flexShrink: 0 }}>
-        {!isLast && (
-          <button
-            onClick={skip}
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "13px",
-              fontWeight: 600,
-              color: "var(--text-muted)",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              padding: "4px 0",
-            }}
-          >
-            Skip
-          </button>
-        )}
-      </div>
-
-      {/* Card */}
-      <div className="flex-1 flex flex-col justify-center px-6" style={{ minHeight: 0, overflow: "hidden" }}>
+      {/* Dark top — headline + body */}
+      <div
+        className="flex-1 flex flex-col justify-center"
+        style={{
+          background: "var(--surface-dark)",
+          padding: "28px",
+          paddingTop: "calc(env(safe-area-inset-top) + 28px)",
+          minHeight: 0,
+        }}
+      >
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={index}
             custom={direction}
-            initial={{ opacity: 0, x: direction * 40 }}
+            initial={{ opacity: 0, x: direction * 48 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -40 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            exit={{ opacity: 0, x: direction * -48 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.1}
+            dragElastic={0.08}
             onDragEnd={handleDragEnd}
-            style={{ cursor: "grab", userSelect: "none" }}
+            style={{ userSelect: "none" }}
           >
             <h2
               style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 800,
-                fontSize: "clamp(48px, 16cqw, 72px)",
+                fontSize: "clamp(52px, 17cqw, 76px)",
                 color: "var(--white)",
                 letterSpacing: "-1px",
-                lineHeight: 0.9,
+                lineHeight: 0.88,
                 marginBottom: "24px",
-                whiteSpace: "pre-line",
               }}
             >
               {card.headline}
@@ -135,10 +117,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             <p
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "15px",
-                color: "var(--text-muted)",
-                lineHeight: 1.6,
-                marginBottom: card.note ? "16px" : 0,
+                fontSize: "16px",
+                color: "#C4B49A",
+                lineHeight: 1.65,
+                marginBottom: 0,
               }}
             >
               {card.body}
@@ -147,9 +129,12 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
               <p
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "12px",
-                  color: "var(--text-muted)",
-                  opacity: 0.6,
+                  fontSize: "13px",
+                  color: "#9A8A72",
+                  lineHeight: 1.5,
+                  marginTop: "20px",
+                  paddingTop: "16px",
+                  borderTop: "1px solid #2E2216",
                 }}
               >
                 {card.note}
@@ -159,20 +144,30 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         </AnimatePresence>
       </div>
 
-      {/* Dots + CTA */}
-      <div className="flex flex-col items-center gap-5 px-6 pb-6" style={{ flexShrink: 0 }}>
+      {/* Cream bottom — dots + CTA + skip */}
+      <div
+        style={{
+          background: "var(--surface)",
+          borderTop: "2px solid var(--border)",
+          flexShrink: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "20px 28px",
+          paddingBottom: "calc(env(safe-area-inset-bottom) + 20px)",
+        }}
+      >
         {/* Dots */}
-        <div className="flex gap-2">
+        <div style={{ display: "flex", gap: "8px", marginBottom: "16px", justifyContent: "center", width: "100%" }}>
           {cards.map((_, i) => (
             <div
               key={i}
               style={{
-                width: i === index ? "20px" : "6px",
+                width: i === index ? "22px" : "6px",
                 height: "6px",
                 borderRadius: "3px",
-                background: i === index ? "var(--white)" : "var(--text-muted)",
-                opacity: i === index ? 1 : 0.4,
-                transition: "width 200ms ease, opacity 200ms ease",
+                background: i === index ? "var(--text-main)" : "var(--border)",
+                transition: "width 220ms ease, background 220ms ease",
               }}
             />
           ))}
@@ -182,21 +177,43 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         <button
           onClick={next}
           style={{
-            background: isLast ? "var(--brand)" : "var(--white)",
-            color: isLast ? "var(--white)" : "var(--surface-dark)",
+            background: "var(--text-main)",
+            color: "var(--white)",
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
-            fontSize: "clamp(18px, 5cqw, 22px)",
+            fontSize: "clamp(19px, 5cqw, 23px)",
             letterSpacing: "0.5px",
             padding: "16px",
             border: "none",
-            borderRadius: "6px",
+            borderRadius: "4px",
             width: "100%",
             cursor: "pointer",
+            marginBottom: "4px",
           }}
         >
           {isLast ? "Got it, let's eat →" : "Next →"}
         </button>
+
+        {/* Skip */}
+        <div style={{ height: "36px", display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }}>
+          {!isLast && (
+            <button
+              onClick={skip}
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "13px",
+                fontWeight: 500,
+                color: "var(--text-muted)",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                padding: "8px 16px",
+              }}
+            >
+              Skip
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

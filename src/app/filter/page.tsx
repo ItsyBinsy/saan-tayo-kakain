@@ -330,8 +330,32 @@ export default function Filter() {
       {/* Header */}
       <div
         className="px-5 pb-4"
-        style={{ borderBottom: "2px solid var(--border)", flexShrink: 0, paddingTop: "calc(20px + env(safe-area-inset-top))" }}
+        style={{ borderBottom: "2px solid var(--border)", flexShrink: 0, paddingTop: "calc(20px + env(safe-area-inset-top))", position: "relative" }}
       >
+        <button
+          onClick={() => setShowOnboarding(true)}
+          aria-label="How this works"
+          style={{
+            position: "absolute",
+            top: "calc(16px + env(safe-area-inset-top))",
+            right: "20px",
+            width: "28px",
+            height: "28px",
+            borderRadius: "50%",
+            border: "1.5px solid var(--border)",
+            background: "transparent",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 800,
+            fontSize: "14px",
+            color: "var(--text-muted)",
+          }}
+        >
+          ?
+        </button>
         <h1
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",

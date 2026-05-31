@@ -326,6 +326,7 @@ export default function Filter() {
         height: "100dvh",
         overflow: "hidden",
         position: "relative",
+        width: "100%",
       }}
     >
       {/* Help button — absolutely positioned inside main, no layout impact */}

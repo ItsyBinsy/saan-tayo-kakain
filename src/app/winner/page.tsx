@@ -384,7 +384,7 @@ export default function Winner() {
         </div>
 
         {/* Primary CTA */}
-        <div style={{ flexShrink: 0, paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)" }}>
+        <div style={{ flexShrink: 0 }}>
           <a
             href={mapsUrl}
             target="_blank"
@@ -394,6 +394,7 @@ export default function Winner() {
             style={{
               background: "var(--brand)",
               padding: "18px",
+              paddingBottom: "calc(18px + env(safe-area-inset-bottom))",
               textDecoration: "none",
               borderTop: "2px solid var(--border)",
               display: "flex",
@@ -423,7 +424,7 @@ export default function Winner() {
               color: "var(--text-muted)",
               textAlign: "center",
               padding: "8px 20px",
-              paddingBottom: "calc(10px + env(safe-area-inset-bottom))",
+              paddingBottom: "10px",
               fontStyle: "italic",
             }}
           >

@@ -210,14 +210,13 @@ export default function Paikutin() {
         transition={{ duration: 0.25 }}
         style={{
           flexShrink: 0,
-          borderTop: hasSpun ? "2px solid transparent" : "2px solid var(--border)",
+          borderTop: "2px solid var(--border)",
           width: "100%",
           padding: "16px",
           paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
           background: "var(--surface)",
           textAlign: "center",
           pointerEvents: "none",
-          transition: "border-color 250ms ease",
         }}
       >
         <p style={{

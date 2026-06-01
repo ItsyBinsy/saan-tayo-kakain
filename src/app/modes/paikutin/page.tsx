@@ -46,18 +46,27 @@ export default function Paikutin() {
   }
 
   const handleStop = () => {
-    setSpinning(false)
-    setStopping(true)
-    setWinnerName(places[prizeNumber].displayName.text)
-    setWinner(places[prizeNumber])
+    // Delay state updates one frame to let the wheel finish its final render
+    requestAnimationFrame(() => {
+      setSpinning(false)
+      setStopping(true)
+      setWinnerName(places[prizeNumber].displayName.text)
+      setWinner(places[prizeNumber])
 
-    setTimeout(() => {
-      setShowLoading(true)
       setTimeout(() => {
-        addUsedMode("paikutin")
-        router.push("/winner")
-      }, 6000)
-    }, 1800)
+        setShowLoading(true)
+        setTimeout(() => {
+          addUsedMode("paikutin")
+          const tryNavigate = () => {
+            router.push("/winner")
+            setTimeout(() => {
+              if (!window.location.pathname.includes("winner")) router.push("/winner")
+            }, 2000)
+          }
+          tryNavigate()
+        }, 6000)
+      }, 1800)
+    })
   }
 
   if (showLoading) {
@@ -97,7 +106,7 @@ export default function Paikutin() {
       onClick={spinWheel}
     >
       {/* Title */}
-      <div className="w-full px-5 mb-4" style={{ flexShrink: 0 }}>
+      <div className="w-full px-5 mb-4" style={{ flexShrink: 0, minHeight: "64px" }}>
         <h1
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Barlow_Condensed, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import OpenInBrowserBanner from "@/components/OpenInBrowserBanner";
 
 const barlowCondensed = Barlow_Condensed({
   subsets: ["latin"],
@@ -64,6 +65,7 @@ export default function RootLayout({
         ))}
       </head>
       <body suppressHydrationWarning>
+        <OpenInBrowserBanner />
         <Script src="https://tally.so/widgets/embed.js" strategy="afterInteractive" />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-42N9LG081H" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">

@@ -119,10 +119,11 @@ export default function Paikutin() {
             transition={{ duration: 0.2 }}
             className="mt-1"
             style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "12px",
-              color: stopping ? "var(--brand)" : "var(--text-muted)",
-              fontWeight: stopping ? 700 : 400,
+              fontFamily: stopping ? "'Barlow Condensed', sans-serif" : "var(--font-body)",
+              fontSize: stopping ? "clamp(22px, 6cqw, 28px)" : "12px",
+              color: stopping ? "var(--text-main)" : "var(--text-muted)",
+              fontWeight: 800,
+              letterSpacing: stopping ? "-0.5px" : "normal",
             }}
           >
             {stopping && winnerName

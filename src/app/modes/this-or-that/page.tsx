@@ -141,7 +141,8 @@ export default function ThisOrThat() {
             padding: "20px 16px",
             cursor: animating ? "default" : "pointer",
             overflow: "hidden",
-            justifyContent: "space-between",
+            justifyContent: "center",
+            gap: "12px",
             originY: 1,
           }}
           animate={
@@ -191,7 +192,8 @@ export default function ThisOrThat() {
             padding: "20px 16px",
             cursor: animating ? "default" : "pointer",
             overflow: "hidden",
-            justifyContent: "space-between",
+            justifyContent: "center",
+            gap: "12px",
             originY: 1,
           }}
           animate={

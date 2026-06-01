@@ -89,6 +89,14 @@ export default function Winner() {
     }
   }, [hydrated, winner])
 
+  useEffect(() => {
+    if (hydrated && winner) {
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        navigator.vibrate([80, 60, 120])
+      }
+    }
+  }, [hydrated, winner])
+
   if (!hydrated || !winner) return (
     <div style={{ background: "var(--surface)", height: "100dvh" }} />
   )

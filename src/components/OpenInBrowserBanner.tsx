@@ -12,7 +12,9 @@ export default function OpenInBrowserBanner() {
     if (inIAB) {
       setShow(true)
       setIsIOS(/iPhone|iPad|iPod/.test(ua))
+      document.documentElement.classList.add("in-iab")
     }
+    return () => document.documentElement.classList.remove("in-iab")
   }, [])
 
   if (!show) return null

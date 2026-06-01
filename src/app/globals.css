@@ -144,6 +144,15 @@ html {
   overscroll-behavior: none;
 }
 
+html.in-iab body {
+  height: 100svh;
+  max-height: 100svh;
+}
+
+html.in-iab {
+  height: 100svh;
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--surface);

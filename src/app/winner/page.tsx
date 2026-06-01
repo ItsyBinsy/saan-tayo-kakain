@@ -187,9 +187,9 @@ export default function Winner() {
             {allModesUsed ? "Universe has spoken." : "It's decided."}
           </motion.p>
           <motion.h1
-            initial={{ opacity: 0, scale: 0.92, y: 16 }}
+            initial={{ opacity: 0, scale: 0.82, y: 32 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
             style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 800,

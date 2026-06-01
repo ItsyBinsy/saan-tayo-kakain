@@ -96,7 +96,7 @@ export default function Modes() {
             fontSize: "13px",
           }}
         >
-          Pick how we decide.
+          What's the game plan?
         </p>
       </div>
 

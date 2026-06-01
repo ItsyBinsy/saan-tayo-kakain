@@ -545,7 +545,7 @@ export default function Filter() {
         onClick={fetchPlaces}
         disabled={loading}
         style={{
-          background: loading ? "var(--text-muted)" : "var(--brand)",
+          background: loading ? "var(--text-muted)" : "var(--text-main)",
           color: "var(--white)",
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 800,

@@ -46,6 +46,7 @@ export default function Winner() {
 
   const hydrated = useHydrated()
   const [confirmMode, setConfirmMode] = useState(false)
+  const [confirmStartOver, setConfirmStartOver] = useState(false)
   const navigatingAway = useRef(false)
   const shownFeedback = useRef(false)
   const clickedDirections = useRef(false)
@@ -361,15 +362,22 @@ export default function Winner() {
                 You've used all modes. Sige na, tara na doon.
               </p>
               <button
-                onClick={() => { navigatingAway.current = true; resetModes(); router.push("/filter") }}
+                onClick={() => {
+                  if (!confirmStartOver) { setConfirmStartOver(true); return }
+                  navigatingAway.current = true
+                  resetModes()
+                  router.push("/filter")
+                }}
+                onBlur={() => setConfirmStartOver(false)}
                 className="flex items-center gap-1.5"
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: "12px",
                   fontWeight: 600,
-                  color: "var(--text-muted)",
+                  color: confirmStartOver ? "var(--brand)" : "var(--text-muted)",
                   background: "transparent",
-                  border: "1.5px solid var(--border)",
+                  border: confirmStartOver ? "1.5px solid var(--brand)" : "1.5px solid var(--border)",
+                  transition: "color 150ms ease, border-color 150ms ease",
                   borderRadius: "4px",
                   padding: "6px 12px",
                   cursor: "pointer",
@@ -377,7 +385,7 @@ export default function Winner() {
                 }}
               >
                 <RefreshCw size={12} strokeWidth={2} aria-hidden />
-                Start over
+                {confirmStartOver ? "Sure? Tap again" : "Start over"}
               </button>
             </div>
           )}

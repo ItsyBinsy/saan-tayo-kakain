@@ -431,6 +431,7 @@ export default function Filter() {
                 alt=""
                 aria-hidden
                 className="meal-icon"
+                data-small={item.label === "Snacks" ? "true" : undefined}
                 style={{
                   alignSelf: "flex-end",
                   objectFit: "contain",

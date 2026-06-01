@@ -179,6 +179,10 @@ body {
   height: clamp(48px, 22cqw, 80px);
 }
 
+.meal-icon[data-small] {
+  transform: scale(0.78);
+}
+
 .filter-divider {
   width: 1.5px;
   background: var(--border);

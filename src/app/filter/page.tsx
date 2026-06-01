@@ -412,6 +412,7 @@ export default function Filter() {
                 borderBottom: !isLastRow ? "1.5px solid var(--border)" : "none",
                 background: isSelected ? "var(--brand)" : "transparent",
                 cursor: "pointer",
+                overflow: "hidden",
               }}
             >
               <span

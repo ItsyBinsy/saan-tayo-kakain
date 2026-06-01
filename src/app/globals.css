@@ -175,8 +175,8 @@ body {
 }
 
 .meal-icon {
-  width: clamp(56px, 26cqw, 96px);
-  height: clamp(56px, 26cqw, 96px);
+  width: clamp(48px, 22cqw, 80px);
+  height: clamp(48px, 22cqw, 80px);
 }
 
 .filter-divider {

@@ -249,7 +249,7 @@ export default function Filter() {
               placeholder="e.g. Katipunan, Quezon City"
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "14px",
+                fontSize: "16px",
                 color: "var(--text-main)",
                 background: "var(--surface)",
                 border: "1.5px solid var(--border)",

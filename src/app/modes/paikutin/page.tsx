@@ -102,6 +102,7 @@ export default function Paikutin() {
         overflow: "hidden",
         paddingTop: "calc(env(safe-area-inset-top) + 32px)",
         paddingBottom: "env(safe-area-inset-bottom)",
+        position: "relative",
       }}
       onClick={spinWheel}
     >
@@ -204,31 +205,44 @@ export default function Paikutin() {
         </div>
       </div>
 
-      {/* Pre-spin CTA hint — always takes up space, fades out after first spin */}
-      <motion.div
-        animate={{ opacity: hasSpun ? 0 : 1 }}
-        transition={{ duration: 0.25 }}
-        style={{
-          flexShrink: 0,
-          borderTop: "2px solid var(--border)",
-          width: "100%",
-          padding: "16px",
-          paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
-          background: "var(--surface)",
-          textAlign: "center",
-          pointerEvents: "none",
-        }}
-      >
-        <p style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontWeight: 800,
-          fontSize: "clamp(18px, 5cqw, 22px)",
-          color: "var(--text-main)",
-          letterSpacing: "0.3px",
-        }}>
-          Tap anywhere to spin →
-        </p>
-      </motion.div>
+      {/* Safe area spacer — always present so wheel doesn't shift */}
+      <div style={{
+        flexShrink: 0,
+        height: "calc(16px + env(safe-area-inset-bottom))",
+        width: "100%",
+      }} />
+
+      {/* Pre-spin CTA hint — removed from layout after first spin */}
+      <AnimatePresence>
+        {!hasSpun && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: "absolute",
+              bottom: "calc(16px + env(safe-area-inset-bottom))",
+              left: 0,
+              right: 0,
+              borderTop: "2px solid var(--border)",
+              padding: "16px",
+              background: "var(--surface)",
+              textAlign: "center",
+              pointerEvents: "none",
+            }}
+          >
+            <p style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: "clamp(18px, 5cqw, 22px)",
+              color: "var(--text-main)",
+              letterSpacing: "0.3px",
+            }}>
+              Tap anywhere to spin →
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   )
 }

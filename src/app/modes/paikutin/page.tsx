@@ -107,7 +107,7 @@ export default function Paikutin() {
       onClick={spinWheel}
     >
       {/* Title */}
-      <div className="w-full px-5 mb-4" style={{ flexShrink: 0, minHeight: "72px" }}>
+      <div className="w-full px-5 mb-4" style={{ flexShrink: 0 }}>
         <h1
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
@@ -120,29 +120,32 @@ export default function Paikutin() {
         >
           Paikutin
         </h1>
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={stopping ? "winner" : spinning ? "spinning" : "idle"}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.2 }}
-            className="mt-1"
-            style={{
-              fontFamily: stopping ? "'Barlow Condensed', sans-serif" : "var(--font-body)",
-              fontSize: stopping ? "clamp(22px, 6cqw, 28px)" : "12px",
-              color: stopping ? "var(--text-main)" : "var(--text-muted)",
-              fontWeight: 800,
-              letterSpacing: stopping ? "-0.5px" : "normal",
-            }}
-          >
-            {stopping && winnerName
-              ? `It's ${winnerName}!`
-              : spinning
-              ? `${places.length} candidates · spinning...`
-              : `${places.length} candidates`}
-          </motion.p>
-        </AnimatePresence>
+        {/* Fixed height container so subtitle never shifts the wheel */}
+        <div style={{ height: "36px", marginTop: "4px", overflow: "hidden" }}>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={stopping ? "winner" : spinning ? "spinning" : "idle"}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: stopping ? "clamp(20px, 5.5cqw, 26px)" : "13px",
+                color: stopping ? "var(--text-main)" : "var(--text-muted)",
+                fontWeight: 800,
+                letterSpacing: stopping ? "-0.5px" : "normal",
+                lineHeight: 1.2,
+              }}
+            >
+              {stopping && winnerName
+                ? `It's ${winnerName}!`
+                : spinning
+                ? `${places.length} candidates · spinning...`
+                : `${places.length} candidates`}
+            </motion.p>
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Wheel + pointer together */}

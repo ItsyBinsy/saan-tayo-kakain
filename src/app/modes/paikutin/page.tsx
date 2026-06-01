@@ -106,7 +106,7 @@ export default function Paikutin() {
       onClick={spinWheel}
     >
       {/* Title */}
-      <div className="w-full px-5 mb-4" style={{ flexShrink: 0, minHeight: "64px" }}>
+      <div className="w-full px-5 mb-4" style={{ flexShrink: 0, minHeight: "72px" }}>
         <h1
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
@@ -152,6 +152,7 @@ export default function Paikutin() {
           minHeight: 0,
           width: "100%",
           cursor: spinning || stopping ? "default" : "pointer",
+          overflow: "hidden",
         }}
       >
         {/* Pointer — sits just above the wheel, always adjacent */}
@@ -203,37 +204,32 @@ export default function Paikutin() {
         </div>
       </div>
 
-      {/* Pre-spin CTA hint — only before first spin */}
-      <AnimatePresence>
-        {!hasSpun && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.25 }}
-            style={{
-              flexShrink: 0,
-              borderTop: "2px solid var(--border)",
-              width: "100%",
-              padding: "16px",
-              paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
-              background: "var(--surface)",
-              textAlign: "center",
-              pointerEvents: "none",
-            }}
-          >
-            <p style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800,
-              fontSize: "clamp(18px, 5cqw, 22px)",
-              color: "var(--text-main)",
-              letterSpacing: "0.3px",
-            }}>
-              Tap anywhere to spin →
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Pre-spin CTA hint — always takes up space, fades out after first spin */}
+      <motion.div
+        animate={{ opacity: hasSpun ? 0 : 1 }}
+        transition={{ duration: 0.25 }}
+        style={{
+          flexShrink: 0,
+          borderTop: hasSpun ? "2px solid transparent" : "2px solid var(--border)",
+          width: "100%",
+          padding: "16px",
+          paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
+          background: "var(--surface)",
+          textAlign: "center",
+          pointerEvents: "none",
+          transition: "border-color 250ms ease",
+        }}
+      >
+        <p style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 800,
+          fontSize: "clamp(18px, 5cqw, 22px)",
+          color: "var(--text-main)",
+          letterSpacing: "0.3px",
+        }}>
+          Tap anywhere to spin →
+        </p>
+      </motion.div>
     </main>
   )
 }

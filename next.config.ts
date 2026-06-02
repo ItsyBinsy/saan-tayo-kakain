@@ -14,6 +14,18 @@ const nextConfig: NextConfig = {
           { key: "Permissions-Policy", value: "geolocation=(self)" },
         ],
       },
+      {
+        source: "/icons/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/animations/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/fonts/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
     ]
   },
 };

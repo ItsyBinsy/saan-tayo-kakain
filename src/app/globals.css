@@ -174,6 +174,11 @@ body {
   }
 }
 
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.2; }
+}
+
 .meal-icon {
   width: clamp(48px, 22cqw, 80px);
   height: clamp(48px, 22cqw, 80px);

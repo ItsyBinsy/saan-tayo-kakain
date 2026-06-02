@@ -8,7 +8,22 @@ import LoadingScreen from "@/components/LoadingScreen"
 import afterPaikutinAnim from "@/animations/after-paikutin.json"
 import { motion, AnimatePresence } from "framer-motion"
 
-const Wheel = dynamic(() => import("react-custom-roulette").then(m => m.Wheel), { ssr: false })
+const Wheel = dynamic(
+  () => import("react-custom-roulette").then(m => m.Wheel),
+  {
+    ssr: false,
+    loading: () => (
+      <div style={{
+        width: "300px",
+        height: "300px",
+        borderRadius: "50%",
+        background: "conic-gradient(#C41E3A 0deg 60deg, #1A1208 60deg 120deg, #A01830 120deg 180deg, #2A1F10 180deg 240deg, #C41E3A 240deg 300deg, #1A1208 300deg 360deg)",
+        opacity: 0.4,
+        animation: "pulse 1.5s ease-in-out infinite",
+      }} />
+    ),
+  }
+)
 
 export default function Paikutin() {
   const router = useRouter()

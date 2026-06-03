@@ -102,9 +102,12 @@ export default function Winner() {
     <div style={{ background: "var(--surface)", height: "100dvh" }} />
   )
 
-  const allModesUsed = ["paikutin", "this-or-that", "bahala-na"].every(
-    (m) => usedModes.includes(m)
-  )
+  const availableModes = [
+    "bahala-na",
+    ...(places.length >= 2 ? ["paikutin"] : []),
+    ...(places.length >= 2 ? ["this-or-that"] : []),
+  ]
+  const allModesUsed = availableModes.every((m) => usedModes.includes(m))
 
   const mapsUrl =
     "https://www.google.com/maps/search/?api=1&query=" +

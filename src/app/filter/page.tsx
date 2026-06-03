@@ -59,6 +59,8 @@ export default function Filter() {
     { label: "Drinks",    icon: "/icons/drinks.png" },
   ]
 
+  const MIN_LOADING_MS = 2500
+
   const fetchPlacesByText = async () => {
     if (!manualLocation.trim()) return
     setManualLoading(true)
@@ -67,11 +69,14 @@ export default function Filter() {
     try {
       const baseCategory = categoryMap[mealType].replace(" near me", "")
       const query = `${baseCategory} near ${manualLocation.trim()}`
-      const response = await fetch("/api/places", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ textQuery: query }),
-      })
+      const [response] = await Promise.all([
+        fetch("/api/places", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ textQuery: query }),
+        }),
+        new Promise((r) => setTimeout(r, MIN_LOADING_MS)),
+      ])
       if (!response.ok) {
         const err = await response.json()
         throw new Error(err.error ?? "Failed to fetch places")
@@ -114,16 +119,19 @@ export default function Filter() {
       async (position) => {
         try {
           const { latitude, longitude } = position.coords
-          const response = await fetch("/api/places", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              category: mealType,
-              latitude,
-              longitude,
-              radius: distanceMap[distance],
+          const [response] = await Promise.all([
+            fetch("/api/places", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                category: mealType,
+                latitude,
+                longitude,
+                radius: distanceMap[distance],
+              }),
             }),
-          })
+            new Promise((r) => setTimeout(r, MIN_LOADING_MS)),
+          ])
           if (!response.ok) {
             const err = await response.json()
             throw new Error(err.error ?? "Failed to fetch places")

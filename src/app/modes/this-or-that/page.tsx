@@ -45,7 +45,7 @@ export default function ThisOrThat() {
         setTimeout(() => {
           addUsedMode("this-or-that")
           router.push("/winner")
-        }, 6000)
+        }, 4000)
         return
       }
 

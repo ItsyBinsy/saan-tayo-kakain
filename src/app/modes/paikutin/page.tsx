@@ -79,7 +79,7 @@ export default function Paikutin() {
             }, 2000)
           }
           tryNavigate()
-        }, 6000)
+        }, 4000)
       }, 1800)
     })
   }

@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
+import { Redis } from "@upstash/redis"
 
 if (!process.env.GOOGLE_PLACES_API_KEY) {
   throw new Error("GOOGLE_PLACES_API_KEY is not set")
 }
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+})
 
 const MAX_PLACES = 10
 
@@ -26,26 +32,19 @@ const ALLOWED_TEXT_CATEGORIES = new Set([
   "cafe or juice bar or milk tea or smoothie",
 ])
 
-const requestLog = new Map<string, number[]>()
-const WINDOW_MS = 60_000
+const WINDOW_S = 60
 const MAX_REQUESTS = 5
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now()
-  const timestamps = (requestLog.get(ip) ?? []).filter(t => now - t < WINDOW_MS)
-  if (timestamps.length >= MAX_REQUESTS) return true
-  if (timestamps.length === 0) {
-    requestLog.delete(ip)
-    requestLog.set(ip, [now])
-  } else {
-    requestLog.set(ip, [...timestamps, now])
-  }
-  return false
+async function isRateLimited(ip: string): Promise<boolean> {
+  const key = `rl:${ip}`
+  const count = await redis.incr(key)
+  if (count === 1) await redis.expire(key, WINDOW_S)
+  return count > MAX_REQUESTS
 }
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
-  if (isRateLimited(ip)) {
+  if (await isRateLimited(ip)) {
     return NextResponse.json({ error: "Too many requests. Try again in a minute." }, { status: 429 })
   }
 

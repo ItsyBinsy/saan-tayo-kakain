@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
-const STORAGE_KEY = "onboarding_seen"
+import { markOnboardingSeen } from "@/lib/onboarding"
 
 const cards: { headline: React.ReactNode; body: string; note: string | null }[] = [
   {
@@ -27,16 +27,6 @@ const cards: { headline: React.ReactNode; body: string; note: string | null }[] 
     note: "iOS: Share → Add to Home Screen\nAndroid: Menu (⋮) → Install app",
   },
 ]
-
-export function shouldShowOnboarding(): boolean {
-  if (typeof window === "undefined") return false
-  return !localStorage.getItem(STORAGE_KEY)
-}
-
-export function markOnboardingSeen() {
-  if (typeof window === "undefined") return
-  localStorage.setItem(STORAGE_KEY, "1")
-}
 
 export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0)

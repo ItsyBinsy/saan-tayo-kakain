@@ -60,15 +60,13 @@ export default function RootLayout({
   return (
     <html lang="en-PH" className={`${barlowCondensed.variable} ${spaceGrotesk.variable}`}>
       <head>
-        {["all","rice","fastfood","snack","dessert","drinks"].map(n => (
-          <link key={n} rel="preload" as="image" href={`/icons/${n}.png`} />
-        ))}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body suppressHydrationWarning>
         <OpenInBrowserBanner />
-        <Script src="https://tally.so/widgets/embed.js" strategy="afterInteractive" />
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-42N9LG081H" strategy="afterInteractive" />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-42N9LG081H" strategy="lazyOnload" />
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react"
 import { useHydrated } from "@/hooks/useHydrated"
 import { motion } from "framer-motion"
 import PageTransition from "@/components/PageTransition"
+import Script from "next/script"
 import { MapPin, Clock, Banknote, PersonStanding, Share2, RotateCcw, RefreshCw } from "lucide-react"
 
 const PRICE_LABEL: Record<string, string> = {
@@ -170,6 +171,7 @@ export default function Winner() {
 
   return (
     <PageTransition>
+      <Script src="https://tally.so/widgets/embed.js" strategy="lazyOnload" />
       <main
         className="flex flex-col"
         style={{ background: "var(--surface)", height: "100dvh", overflow: "hidden" }}

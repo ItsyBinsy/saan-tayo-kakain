@@ -2,10 +2,19 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { motion } from "framer-motion"
 import dynamic from "next/dynamic"
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false })
 import splashAnim from "@/animations/splash.json"
+
+const Lottie = dynamic(() => import("lottie-react"), {
+  ssr: false,
+  loading: () => (
+    <div style={{
+      width: "clamp(80px, 24cqw, 140px)",
+      height: "clamp(80px, 24cqw, 140px)",
+      flexShrink: 0,
+    }} />
+  ),
+})
 
 export default function Home() {
   const router = useRouter()
@@ -19,8 +28,13 @@ export default function Home() {
       role="button"
       tabIndex={0}
       aria-label="Tap to start"
-      className="flex flex-col items-center justify-center relative cursor-pointer"
       style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        cursor: "pointer",
         background: "var(--surface)",
         minHeight: "100dvh",
         overflow: "hidden",
@@ -28,14 +42,13 @@ export default function Home() {
       onClick={() => router.push("/filter")}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") router.push("/filter") }}
     >
-      <motion.div
+      {/* Title renders immediately — LCP element, no JS dependency */}
+      <div
         className="flex flex-col items-center px-6"
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        style={{ animation: "splash-fade-up 0.7s ease-out both" }}
       >
-        {/* Lottie stands at the base of the title */}
         <div className="flex items-end gap-1">
+          {/* Lottie loads after title is already painted */}
           <Lottie
             animationData={splashAnim}
             loop
@@ -67,17 +80,33 @@ export default function Home() {
             </p>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.p
-        className="absolute bottom-8 text-xs uppercase tracking-widest"
-        style={{ color: "var(--text-muted)", fontFamily: "var(--font-body)" }}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: [0, 0.5, 0.5, 0.2, 0.5], y: [8, 0, -4, 0, -4] }}
-        transition={{ delay: 1, duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      <p
+        style={{
+          position: "absolute",
+          bottom: "2rem",
+          fontSize: "0.75rem",
+          textTransform: "uppercase",
+          letterSpacing: "0.12em",
+          color: "var(--text-muted)",
+          fontFamily: "var(--font-body)",
+          animation: "splash-tap-pulse 3s ease-in-out 1s infinite",
+        }}
       >
         Tap anywhere to start
-      </motion.p>
+      </p>
+
+      <style>{`
+        @keyframes splash-fade-up {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes splash-tap-pulse {
+          0%, 100% { opacity: 0.5; transform: translateY(0); }
+          50%       { opacity: 0.2; transform: translateY(-4px); }
+        }
+      `}</style>
     </main>
   )
 }

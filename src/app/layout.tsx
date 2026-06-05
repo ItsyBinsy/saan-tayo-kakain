@@ -59,7 +59,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en-PH" className={`${barlowCondensed.variable} ${spaceGrotesk.variable}`}>
-
+      <head>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+      </head>
       <body suppressHydrationWarning>
         <OpenInBrowserBanner />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-42N9LG081H" strategy="lazyOnload" />

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import LoadingScreen from "@/components/LoadingScreen"
+import afterThisOrThatAnim from "@/animations/after-this-or-that.json"
 import { motion, AnimatePresence } from "framer-motion"
 
 export default function ThisOrThat() {
@@ -59,7 +60,7 @@ export default function ThisOrThat() {
   if (showLoading) {
     return (
       <LoadingScreen
-        animationSrc="/animations/after-this-or-that.json"
+        animationData={afterThisOrThatAnim}
         message="The decision has been made."
         sub="Tara na bago ka pa magbago ng isip."
         indicator="dots"

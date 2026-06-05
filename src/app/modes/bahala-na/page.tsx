@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import LoadingScreen from "@/components/LoadingScreen"
+import bahalaNaAnim from "@/animations/bahala-na.json"
 
 export default function BahalaNa() {
   const router = useRouter()
@@ -30,7 +31,7 @@ export default function BahalaNa() {
 
   return (
     <LoadingScreen
-      animationSrc="/animations/bahala-na.json"
+      animationData={bahalaNaAnim}
       message="Picking one for you..."
       sub="Huwag sana itong ayaw mo."
       indicator="dots"

@@ -3,13 +3,21 @@
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import dynamic from "next/dynamic"
-import { useLottieAnim } from "@/hooks/useLottieAnim"
+import splashAnim from "@/animations/splash.json"
 
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false })
+const Lottie = dynamic(() => import("lottie-react"), {
+  ssr: false,
+  loading: () => (
+    <div style={{
+      width: "clamp(80px, 24cqw, 140px)",
+      height: "clamp(80px, 24cqw, 140px)",
+      flexShrink: 0,
+    }} />
+  ),
+})
 
 export default function Home() {
   const router = useRouter()
-  const animData = useLottieAnim("/animations/splash.json")
 
   useEffect(() => {
     router.prefetch("/filter")
@@ -40,11 +48,16 @@ export default function Home() {
         style={{ animation: "splash-fade-up 0.7s ease-out both" }}
       >
         <div className="flex items-end gap-1">
-          <div style={{ width: "clamp(80px, 24cqw, 140px)", height: "clamp(80px, 24cqw, 140px)", flexShrink: 0 }}>
-            {animData && (
-              <Lottie animationData={animData} loop style={{ width: "100%", height: "100%" }} />
-            )}
-          </div>
+          {/* Lottie loads after title is already painted */}
+          <Lottie
+            animationData={splashAnim}
+            loop
+            style={{
+              width: "clamp(80px, 24cqw, 140px)",
+              height: "clamp(80px, 24cqw, 140px)",
+              flexShrink: 0,
+            }}
+          />
           <div>
             <h1
               className="leading-none"

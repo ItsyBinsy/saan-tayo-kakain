@@ -1,20 +1,16 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useLottieAnim } from "@/hooks/useLottieAnim"
-
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false })
 
 type Props = {
-  animationSrc: string
+  animationData: object
   message: string
   sub: string
   indicator?: "dots" | "bar"
 }
 
-export default function LoadingScreen({ animationSrc, message, sub, indicator = "bar" }: Props) {
-  const animData = useLottieAnim(animationSrc)
-
+export default function LoadingScreen({ animationData, message, sub, indicator = "bar" }: Props) {
   return (
     <main
       className="flex flex-col items-center justify-center gap-6"
@@ -25,15 +21,11 @@ export default function LoadingScreen({ animationSrc, message, sub, indicator = 
         padding: "24px",
       }}
     >
-      <div style={{ width: "50cqw", height: "50cqw", maxWidth: 240, maxHeight: 240 }}>
-        {animData && (
-          <Lottie
-            animationData={animData}
-            loop
-            style={{ width: "100%", height: "100%", mixBlendMode: "multiply" }}
-          />
-        )}
-      </div>
+      <Lottie
+        animationData={animationData}
+        loop
+        style={{ width: "50cqw", height: "50cqw", maxWidth: 240, maxHeight: 240, mixBlendMode: "multiply" }}
+      />
 
       <div className="flex flex-col items-center gap-3 text-center">
         <p

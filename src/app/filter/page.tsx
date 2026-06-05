@@ -7,6 +7,7 @@ import PageTransition from "@/components/PageTransition"
 import { useRouter } from "next/navigation"
 import { useStore, type Place } from "@/store"
 import LoadingScreen from "@/components/LoadingScreen"
+import findingPlacesAnim from "@/animations/finding-places.json"
 import dynamic from "next/dynamic"
 const Onboarding = dynamic(() => import("@/components/Onboarding"))
 import { shouldShowOnboarding } from "@/lib/onboarding"
@@ -317,7 +318,7 @@ export default function Filter() {
   if (loading) {
     return (
       <LoadingScreen
-        animationSrc="/animations/finding-places.json"
+        animationData={findingPlacesAnim}
         message="Looking for places near you..."
         sub="Puro kasi kayo Kahit Saan."
         indicator="bar"

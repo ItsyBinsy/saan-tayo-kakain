@@ -1,21 +1,26 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import dynamic from "next/dynamic"
 import splashAnim from "@/animations/splash.json"
 
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false })
+const Lottie = dynamic(() => import("lottie-react"), {
+  ssr: false,
+  loading: () => (
+    <div style={{
+      width: "clamp(80px, 24cqw, 140px)",
+      height: "clamp(80px, 24cqw, 140px)",
+      flexShrink: 0,
+    }} />
+  ),
+})
 
 export default function Home() {
   const router = useRouter()
-  // Defer Lottie mount by one frame so the h1 paints first and wins LCP
-  const [showLottie, setShowLottie] = useState(false)
 
   useEffect(() => {
     router.prefetch("/filter")
-    const id = requestAnimationFrame(() => setShowLottie(true))
-    return () => cancelAnimationFrame(id)
   }, [router])
 
   return (
@@ -37,25 +42,22 @@ export default function Home() {
       onClick={() => router.push("/filter")}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") router.push("/filter") }}
     >
+      {/* Title renders immediately — LCP element, no JS dependency */}
       <div
         className="flex flex-col items-center px-6"
         style={{ animation: "splash-fade-up 0.7s ease-out both" }}
       >
         <div className="flex items-end gap-1">
-          {/* Placeholder holds space until Lottie mounts — h1 paints first */}
-          <div style={{
-            width: "clamp(80px, 24cqw, 140px)",
-            height: "clamp(80px, 24cqw, 140px)",
-            flexShrink: 0,
-          }}>
-            {showLottie && (
-              <Lottie
-                animationData={splashAnim}
-                loop
-                style={{ width: "100%", height: "100%" }}
-              />
-            )}
-          </div>
+          {/* Lottie loads after title is already painted */}
+          <Lottie
+            animationData={splashAnim}
+            loop
+            style={{
+              width: "clamp(80px, 24cqw, 140px)",
+              height: "clamp(80px, 24cqw, 140px)",
+              flexShrink: 0,
+            }}
+          />
           <div>
             <h1
               className="leading-none"

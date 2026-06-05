@@ -26,13 +26,10 @@ export default function LoadingScreen({ animationSrc, message, sub, indicator = 
       }}
     >
       <div style={{ width: "50cqw", height: "50cqw", maxWidth: 240, maxHeight: 240 }}>
-        {animData && (
-          <Lottie
-            animationData={animData}
-            loop
-            style={{ width: "100%", height: "100%", mixBlendMode: "multiply" }}
-          />
-        )}
+        {animData
+          ? <Lottie animationData={animData} loop style={{ width: "100%", height: "100%", mixBlendMode: "multiply" }} />
+          : <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "var(--border)", animation: "lottie-pulse 1.2s ease-in-out infinite" }} />
+        }
       </div>
 
       <div className="flex flex-col items-center gap-3 text-center">
@@ -94,6 +91,10 @@ export default function LoadingScreen({ animationSrc, message, sub, indicator = 
       )}
 
       <style>{`
+        @keyframes lottie-pulse {
+          0%, 100% { opacity: 0.15; }
+          50% { opacity: 0.3; }
+        }
         @keyframes dot-pulse {
           0%, 80%, 100% { opacity: 0.25; transform: scale(1); }
           40% { opacity: 1; transform: scale(1.3); }

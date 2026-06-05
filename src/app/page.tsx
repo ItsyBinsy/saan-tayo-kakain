@@ -41,9 +41,10 @@ export default function Home() {
       >
         <div className="flex items-end gap-1">
           <div style={{ width: "clamp(80px, 24cqw, 140px)", height: "clamp(80px, 24cqw, 140px)", flexShrink: 0 }}>
-            {animData && (
-              <Lottie animationData={animData} loop style={{ width: "100%", height: "100%" }} />
-            )}
+            {animData
+              ? <Lottie animationData={animData} loop style={{ width: "100%", height: "100%" }} />
+              : <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "var(--border)", animation: "lottie-pulse 1.2s ease-in-out infinite" }} />
+            }
           </div>
           <div>
             <h1
@@ -88,6 +89,10 @@ export default function Home() {
         @keyframes splash-fade-up {
           from { opacity: 0; transform: translateY(24px); }
           to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes lottie-pulse {
+          0%, 100% { opacity: 0.15; }
+          50% { opacity: 0.3; }
         }
         @keyframes splash-tap-pulse {
           0%, 100% { opacity: 0.5; transform: translateY(0); }

@@ -59,7 +59,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en-PH" className={`${barlowCondensed.variable} ${spaceGrotesk.variable}`}>
-
+      <head>
+        <link rel="preload" href="/animations/splash.json" as="fetch" crossOrigin="anonymous" />
+      </head>
       <body suppressHydrationWarning>
         <OpenInBrowserBanner />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-42N9LG081H" strategy="lazyOnload" />

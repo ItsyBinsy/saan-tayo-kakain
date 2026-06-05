@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import dynamic from "next/dynamic"
 import LoadingScreen from "@/components/LoadingScreen"
-import afterPaikutinAnim from "@/animations/after-paikutin.json"
 import { motion, AnimatePresence } from "framer-motion"
 
 const Wheel = dynamic(
@@ -87,7 +86,7 @@ export default function Paikutin() {
   if (showLoading) {
     return (
       <LoadingScreen
-        animationData={afterPaikutinAnim}
+        animationSrc="/animations/after-paikutin.json"
         message="No more going in circles."
         sub="Huwag kang magreklamo."
         indicator="bar"

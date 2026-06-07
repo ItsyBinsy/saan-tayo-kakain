@@ -10,7 +10,8 @@ interface Props {
   slices: Slice[]
   spinning: boolean
   targetIndex: number
-  onStop: () => void
+  winnerIndex: number | null
+  onStop: (actualIndex: number) => void
 }
 
 const SLICE_GRADIENTS: [string, string][] = [
@@ -18,21 +19,19 @@ const SLICE_GRADIENTS: [string, string][] = [
   ["#F5EDD8", "#DDD0B0"],
 ]
 
-const OUTLINE     = "#0E0A04"
-const RIM_INNER   = "#C41E3A"
-const RIM_OUTER   = "#0E0A04"
-const CENTER_FILL = "#1A1208"
-const CENTER_RING = "#C41E3A"
-const CENTER_DOT  = "#F5EDD8"
+const OUTLINE       = "#0E0A04"
+const RIM_INNER     = "#C41E3A"
+const RIM_OUTER     = "#0E0A04"
+const CENTER_FILL   = "#1A1208"
+const CENTER_RING   = "#C41E3A"
+const CENTER_DOT    = "#F5EDD8"
 const POINTER_FILL  = "#F5EDD8"
 const POINTER_GLOW  = "#C41E3A"
 
-const VBOX = 300
-const cx   = VBOX / 2
-const cy   = VBOX / 2
-const r    = VBOX / 2 - 7
-
-// Idle: one full revolution every 20 seconds
+const VBOX            = 300
+const cx              = VBOX / 2
+const cy              = VBOX / 2
+const r               = VBOX / 2 - 7
 const IDLE_DEG_PER_MS = 360 / 20000
 
 function truncate(text: string, max: number) {
@@ -58,28 +57,39 @@ function easeOut(t: number) {
   return 1 - Math.pow(1 - t, 5)
 }
 
-export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Props) {
-  const svgRef    = useRef<SVGSVGElement>(null)
-  const wrapRef   = useRef<HTMLDivElement>(null)
-  const rotRef    = useRef(0)
-  const rafRef    = useRef<number>(0)
-  const t0Ref     = useRef(0)
-  const fromRef   = useRef(0)
-  const toRef     = useRef(0)
-  const durRef    = useRef(4200)
-  const onStopRef = useRef(onStop)
+export default function SpinWheel({ slices, spinning, targetIndex, winnerIndex, onStop }: Props) {
+  const svgRef  = useRef<SVGSVGElement>(null)
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  // All animation state lives in refs — zero React re-renders per frame
+  const rotRef  = useRef(0)
+  const rafRef  = useRef<number>(0)
+  const t0Ref   = useRef(0)
+  const fromRef = useRef(0)
+  const toRef   = useRef(0)
+  const durRef  = useRef(4200)
+
+  // Always-current copies of props/derived values for use inside callbacks
+  const onStopRef   = useRef(onStop)
+  const sliceDegRef = useRef(0)
+  const nRef        = useRef(0)
   onStopRef.current = onStop
 
-  const idleRafRef  = useRef<number>(0)
-  const idleActive  = useRef(true)
-  const lastTsRef   = useRef<number>(0)
+  // Idle loop state
+  const idleRafRef = useRef<number>(0)
+  const idleActive = useRef(false)
+  const lastTsRef  = useRef(0)
 
+  // Derived — declared after refs so refs can be updated below
   const n        = slices.length
   const sliceDeg = 360 / n
   const fontSize = n <= 3 ? 17 : n <= 5 ? 15 : n <= 7 ? 12 : 10
   const maxChars = n <= 3 ? 18 : n <= 5 ? 14 : n <= 7 ? 12 : 9
 
-  // Pre-compute all slice geometry once — only recalculates when slices change
+  // Keep refs in sync every render (safe — refs don't trigger re-renders)
+  sliceDegRef.current = sliceDeg
+  nRef.current        = n
+
   const sliceData = useMemo(() => slices.map((slice, i) => ({
     path:   buildSlicePath(i, sliceDeg),
     label:  buildLabelTransform(i, sliceDeg),
@@ -88,7 +98,7 @@ export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Pro
     text:   truncate(slice.label, maxChars),
   })), [slices, sliceDeg, maxChars])
 
-  // Idle: uses real timestamp delta — framerate-independent
+  // Idle rotation — framerate-independent via real timestamp delta
   const idleAnimate = useCallback((ts: number) => {
     if (!svgRef.current || !idleActive.current) return
     if (lastTsRef.current !== 0) {
@@ -96,7 +106,7 @@ export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Pro
       rotRef.current = (rotRef.current + IDLE_DEG_PER_MS * delta) % 360
       svgRef.current.style.transform = `rotate(${rotRef.current}deg)`
     }
-    lastTsRef.current = ts
+    lastTsRef.current  = ts
     idleRafRef.current = requestAnimationFrame(idleAnimate)
   }, [])
 
@@ -112,29 +122,35 @@ export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Pro
     cancelAnimationFrame(idleRafRef.current)
   }, [])
 
-  // Spin animation — timestamp-based, no assumptions about frame rate
+  // Spin animation — reads sliceDeg/n from refs so it's always current
   const animate = useCallback((ts: number) => {
     if (!svgRef.current) return
     if (t0Ref.current === 0) t0Ref.current = ts
-    const t = Math.min((ts - t0Ref.current) / durRef.current, 1)
+    const t   = Math.min((ts - t0Ref.current) / durRef.current, 1)
     const cur = fromRef.current + (toRef.current - fromRef.current) * easeOut(t)
     rotRef.current = cur
     svgRef.current.style.transform = `rotate(${cur}deg)`
+
     if (t < 1) {
       rafRef.current = requestAnimationFrame(animate)
     } else {
-      onStopRef.current()
+      // Reading: at rotation X, slice at pointer satisfies i*sd + sd/2 + X ≡ 0
+      //   i = floor( ((-X mod 360 + 360) mod 360) / sd )
+      const sd          = sliceDegRef.current
+      const negMod      = ((-cur % 360) + 360) % 360
+      const actualIndex = Math.floor(negMod / sd) % nRef.current
+      onStopRef.current(actualIndex)
       startIdle()
     }
   }, [startIdle])
 
-  // Mount: start idle
+  // Mount: start idle spin
   useEffect(() => {
     startIdle()
     return () => stopIdle()
   }, [startIdle, stopIdle])
 
-  // Glow pulse — CSS animation on wrapper, not on the rotating SVG
+  // Glow pulse while spinning
   useEffect(() => {
     if (!wrapRef.current) return
     wrapRef.current.style.animation = spinning
@@ -142,25 +158,21 @@ export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Pro
       : "none"
   }, [spinning])
 
-  // Spin trigger
+  // Spin trigger — target landing math
   useEffect(() => {
     if (!spinning) return
     stopIdle()
     t0Ref.current = 0
 
-    // --- Pointer landing math ---
-    // Slices are drawn with a -90° offset so slice 0 starts at the top (12 o'clock).
-    // Slice i's midpoint in wheel-local degrees (before any rotation):
-    //   mid = i * sliceDeg + sliceDeg/2 - 90
-    // The pointer sits at 0° (top). For the pointer to point at slice i,
-    // we need the wheel rotated so that mid lands at 0°.
-    // That means we need to ADD (360 - mid) % 360 to the current rotation,
-    // normalised against the current accumulated rotation so we don't overshoot.
-    const sliceMidLocal = targetIndex * sliceDeg + sliceDeg / 2 - 90
-    const currentMod    = ((rotRef.current % 360) + 360) % 360 // always 0–360
-    const needed        = ((360 - sliceMidLocal) % 360 + 360) % 360 // always 0–360
-    const shortestAdd   = ((needed - currentMod) % 360 + 360) % 360 // 0–360 delta
-    const extraSpins    = (6 + Math.floor(Math.random() * 3)) * 360
+    // CSS rotate(X) clockwise. Slice i center is at SVG angle (i*sd + sd/2 - 90).
+    // After rotating X, its visual angle = i*sd + sd/2 - 90 + X.
+    // Pointer is at -90 (12 o'clock). For slice i to land at pointer:
+    //   i*sd + sd/2 + X ≡ 0  →  X ≡ -(i*sd + sd/2)
+    const needed      = -(targetIndex * sliceDeg + sliceDeg / 2)
+    const currentMod  = ((rotRef.current % 360) + 360) % 360
+    const neededMod   = ((needed % 360) + 360) % 360
+    const shortestAdd = ((neededMod - currentMod) % 360 + 360) % 360
+    const extraSpins  = (6 + Math.floor(Math.random() * 3)) * 360
 
     fromRef.current = rotRef.current
     toRef.current   = rotRef.current + extraSpins + shortestAdd
@@ -173,22 +185,19 @@ export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Pro
   return (
     <div style={{
       position: "relative",
-      // vw only — works on iOS 9+, all IABs, no cqw needed.
-      // min() with px cap is universally supported since iOS 11.
       width:  "min(160vw, 720px)",
       height: "min(160vw, 720px)",
       marginTop: "auto",
-      // Pull bottom half below viewport — parent overflow:hidden clips it.
       marginBottom: "calc(-1 * min(80vw, 360px))",
       flexShrink: 0,
       alignSelf: "center",
     }}>
-      {/* Pointer — outside the rotating SVG, never moves */}
+      {/* Pointer — static, never rotates */}
       <svg
         viewBox="0 0 48 44"
         style={{
           position: "absolute",
-          top: "-3.5%",
+          top: "-4.24%",
           left: "50%",
           transform: "translateX(-50%)",
           width: "9%",
@@ -202,11 +211,7 @@ export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Pro
         <polygon points="24,42 17,28 31,28" fill={POINTER_GLOW} />
       </svg>
 
-      {/*
-        Wrapper: drop-shadow is here, NOT on the rotating SVG.
-        This means the shadow is composited once and not recomputed
-        every animation frame.
-      */}
+      {/* Wrapper: drop-shadow here so it's composited once, not per frame */}
       <div
         ref={wrapRef}
         style={{
@@ -216,12 +221,7 @@ export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Pro
           filter: "drop-shadow(0 8px 32px rgba(14,10,4,0.55))",
         }}
       >
-        {/*
-          Only `transform` changes during animation.
-          willChange: "transform" tells the GPU to promote this to
-          its own layer — no layout or paint triggered per frame.
-          No filter here — that would break layer promotion.
-        */}
+        {/* Only transform mutates per frame — GPU layer promoted via willChange */}
         <svg
           ref={svgRef}
           viewBox={`0 0 ${VBOX} ${VBOX}`}
@@ -229,36 +229,32 @@ export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Pro
         >
           <defs>
             {SLICE_GRADIENTS.map(([inner, outer], gi) => (
-              <radialGradient
-                key={gi}
-                id={`sg-${gi}`}
-                cx="50%" cy="30%" r="80%"
-                gradientUnits="objectBoundingBox"
-              >
+              <radialGradient key={gi} id={`sg-${gi}`} cx="50%" cy="30%" r="80%" gradientUnits="objectBoundingBox">
                 <stop offset="0%"   stopColor={inner} stopOpacity={0.9} />
                 <stop offset="100%" stopColor={outer} />
               </radialGradient>
             ))}
           </defs>
 
-          {/* Outer dark rim */}
           <circle cx={cx} cy={cy} r={VBOX / 2 - 1} fill={RIM_OUTER} />
-
-          {/* Red ring — static, no SVG filter so no per-frame GPU cost */}
           <circle cx={cx} cy={cy} r={VBOX / 2 - 5} fill="none" stroke={RIM_INNER} strokeWidth={4} />
 
-          {/* Slices — geometry pre-computed, only label text rendered here */}
           {sliceData.map(({ path, label: lbl, gradId, isDark, text }, i) => {
-            const textFill = isDark ? "#F5EDD8" : "#1A1208"
+            const isWinner = winnerIndex === i
             return (
               <g key={i}>
-                <path d={path} fill={`url(#${gradId})`} stroke={OUTLINE} strokeWidth={1.5} />
+                <path
+                  d={path}
+                  fill={isWinner ? "#FFD700" : `url(#${gradId})`}
+                  stroke={isWinner ? "#FFD700" : OUTLINE}
+                  strokeWidth={isWinner ? 3 : 1.5}
+                />
                 <text
                   x={lbl.x} y={lbl.y}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   transform={`rotate(${lbl.rotate}, ${lbl.x}, ${lbl.y})`}
-                  fill={textFill}
+                  fill={isWinner ? "#1A1208" : isDark ? "#F5EDD8" : "#1A1208"}
                   fontSize={fontSize}
                   fontWeight={900}
                   fontFamily="'Barlow Condensed', sans-serif"
@@ -271,7 +267,6 @@ export default function SpinWheel({ slices, spinning, targetIndex, onStop }: Pro
             )
           })}
 
-          {/* Center hub */}
           <circle cx={cx} cy={cy} r={22} fill={OUTLINE} />
           <circle cx={cx} cy={cy} r={18} fill={CENTER_RING} />
           <circle cx={cx} cy={cy} r={13} fill={CENTER_FILL} />

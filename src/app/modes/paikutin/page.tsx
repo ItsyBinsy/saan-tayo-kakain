@@ -20,6 +20,7 @@ export default function Paikutin() {
 
   const [spinning, setSpinning] = useState(false)
   const [targetIndex, setTargetIndex] = useState(0)
+  const [winnerIndex, setWinnerIndex] = useState<number | null>(null)
   const [showLoading, setShowLoading] = useState(false)
   const [hasSpun, setHasSpun] = useState(false)
   const [winnerName, setWinnerName] = useState<string | null>(null)
@@ -55,11 +56,14 @@ export default function Paikutin() {
     setWinnerName(null)
   }, [spinning, revealed, places.length])
 
-  const handleStop = useCallback(() => {
+  const handleStop = useCallback((actualIndex: number) => {
     setSpinning(false)
     spinLock.current = false
 
-    const winner = places[targetIndex]
+    // Use actualIndex from the wheel's real final rotation — not targetIndex state.
+    // targetIndex is React state and may be stale in this closure.
+    const winner = places[actualIndex]
+    setWinnerIndex(actualIndex)
     setWinnerName(winner.displayName.text)
     setWinner(winner)
     setRevealed(true)
@@ -80,7 +84,7 @@ export default function Paikutin() {
         router.push("/winner")
       }, 4000)
     }, 1600)
-  }, [places, targetIndex, setWinner, addUsedMode, router, fireConfetti])
+  }, [places, setWinner, addUsedMode, router, fireConfetti])
 
   if (showLoading) {
     return (
@@ -180,6 +184,7 @@ export default function Paikutin() {
           slices={slices}
           spinning={spinning}
           targetIndex={targetIndex}
+          winnerIndex={winnerIndex}
           onStop={handleStop}
         />
       </div>

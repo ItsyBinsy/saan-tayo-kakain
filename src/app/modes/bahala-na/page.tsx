@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
+import { useHydrated } from "@/hooks/useHydrated"
 import LoadingScreen from "@/components/LoadingScreen"
 import bahalaNaAnim from "@/animations/bahala-na.json"
 
@@ -13,7 +14,10 @@ export default function BahalaNa() {
   const addUsedMode = useStore((state) => state.addUsedMode)
   const usedModes = useStore((state) => state.usedModes)
 
+  const hydrated = useHydrated()
+
   useEffect(() => {
+    if (!hydrated) return
     if (places.length === 0) { router.push("/filter"); return }
 
     if (!usedModes.includes("bahala-na")) {
@@ -27,7 +31,7 @@ export default function BahalaNa() {
     }, 6000)
 
     return () => clearTimeout(timer)
-  }, [places, router, setWinner, addUsedMode, usedModes])
+  }, [hydrated, places, router, setWinner, addUsedMode, usedModes])
 
   return (
     <LoadingScreen

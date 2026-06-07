@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
+import { useHydrated } from "@/hooks/useHydrated"
 import LoadingScreen from "@/components/LoadingScreen"
 import afterThisOrThatAnim from "@/animations/after-this-or-that.json"
 import { motion, AnimatePresence } from "framer-motion"
@@ -14,6 +15,8 @@ export default function ThisOrThat() {
   const setWinner = useStore((state) => state.setWinner)
   const addUsedMode = useStore((state) => state.addUsedMode)
 
+  const hydrated = useHydrated()
+
   const candidates = places.slice(0, 5)
   const [remaining, setRemaining] = useState(candidates)
   const [left, setLeft] = useState(candidates[0])
@@ -24,9 +27,10 @@ export default function ThisOrThat() {
   const [animating, setAnimating] = useState(false)
 
   useEffect(() => {
+    if (!hydrated) return
     if (candidates.length < 2) router.replace("/filter")
     else if (!showLoading && usedModes.includes("this-or-that")) router.replace("/winner")
-  }, [candidates.length, usedModes, showLoading, router])
+  }, [hydrated, candidates.length, usedModes, showLoading, router])
 
   const handlePick = (side: "left" | "right") => {
     if (animating) return

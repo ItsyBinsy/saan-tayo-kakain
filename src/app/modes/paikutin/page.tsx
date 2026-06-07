@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
+import { useHydrated } from "@/hooks/useHydrated"
 import dynamic from "next/dynamic"
 import LoadingScreen from "@/components/LoadingScreen"
 import afterPaikutinAnim from "@/animations/after-paikutin.json"
@@ -32,6 +33,8 @@ export default function Paikutin() {
   const setWinner = useStore((state) => state.setWinner)
   const addUsedMode = useStore((state) => state.addUsedMode)
 
+  const hydrated = useHydrated()
+
   const [spinning, setSpinning] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
   const [showLoading, setShowLoading] = useState(false)
@@ -40,9 +43,10 @@ export default function Paikutin() {
   const [winnerName, setWinnerName] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!hydrated) return
     if (places.length === 0) router.replace("/filter")
     else if (!showLoading && usedModes.includes("paikutin")) router.replace("/winner")
-  }, [places, usedModes, showLoading, router])
+  }, [hydrated, places, usedModes, showLoading, router])
 
   const truncate = (text: string, max: number) =>
     text.length > max ? text.slice(0, max - 1) + "…" : text

@@ -15,16 +15,16 @@ const MAX_PLACES = 10
 // Maps display name keywords to the ONE category they belong to.
 // Order matters — first match wins. More specific patterns go first.
 const KEYWORD_RULES: { pattern: RegExp; category: string }[] = [
-  // Fast food chains — never a rice meal or snack result
+  // Fast food chains
   { pattern: /jollibee|mcdonald|kfc|chowking|burger\s*king|greenwich|popeyes|wendy'?s|carl'?s\s*jr|bk\b/i, category: "Fast food" },
   { pattern: /angel'?s?\s*burger|minute\s*burger|tropical\s*hut|lotto\s*burger/i,                          category: "Fast food" },
-  { pattern: /tapsilugan|tapsihan|tapsi\b/i,                                                               category: "Rice meal" },
   { pattern: /mang\s*inasal|andok'?s|baliwag|savory\s*chicken/i,                                          category: "Fast food" },
 
-  // Rice meal spots — carinderia, silog-centric, lutong bahay
-  { pattern: /carenderia|carinderia|carendaria|kainan|eatery|lutong\s*bahay|turo.?turo|ulam/i, category: "Rice meal" },
-  { pattern: /silog|tapsilog|longsilog|tocilog|bangsilog|cornsilog|hotsilog|chicksilog/i,      category: "Rice meal" },
-  { pattern: /lugawan|arroz\s*caldo|goto\b|bulalo\b|kanin/i,                                   category: "Rice meal" },
+  // Rice meal spots — tapsi, silog, carinderia, lutong bahay
+  { pattern: /tapsilugan|tapsihan|tapsilog|tapsi\b/i,                                                      category: "Rice meal" },
+  { pattern: /carenderia|carinderia|carendaria|kainan|eatery|lutong\s*bahay|turo.?turo|ulam/i,             category: "Rice meal" },
+  { pattern: /silog|longsilog|tocilog|bangsilog|cornsilog|hotsilog|chicksilog/i,                           category: "Rice meal" },
+  { pattern: /lugawan|arroz\s*caldo|goto\b|bulalo\b|kanin/i,                                               category: "Rice meal" },
 
   // Snacks — bread-forward, merienda spots
   { pattern: /pandesal|panaderia|tinapay|bread\s*house|breadhaus/i, category: "Snacks" },

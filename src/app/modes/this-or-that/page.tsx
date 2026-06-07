@@ -17,20 +17,28 @@ export default function ThisOrThat() {
 
   const hydrated = useHydrated()
 
-  const candidates = places.slice(0, 5)
-  const [remaining, setRemaining] = useState(candidates)
-  const [left, setLeft] = useState(candidates[0])
-  const [right, setRight] = useState(candidates[1])
+  const [remaining, setRemaining] = useState<typeof places>([])
+  const [left, setLeft] = useState<typeof places[0] | undefined>(undefined)
+  const [right, setRight] = useState<typeof places[0] | undefined>(undefined)
   const [round, setRound] = useState(1)
   const [showLoading, setShowLoading] = useState(false)
   const [picked, setPicked] = useState<"left" | "right" | null>(null)
   const [animating, setAnimating] = useState(false)
+  const [initialized, setInitialized] = useState(false)
+
+  const candidates = places.slice(0, 5)
 
   useEffect(() => {
     if (!hydrated) return
     if (candidates.length < 2) router.replace("/filter")
     else if (!showLoading && usedModes.includes("this-or-that")) router.replace("/winner")
-  }, [hydrated, candidates.length, usedModes, showLoading, router])
+    else if (!initialized) {
+      setRemaining(candidates)
+      setLeft(candidates[0])
+      setRight(candidates[1])
+      setInitialized(true)
+    }
+  }, [hydrated, candidates.length, usedModes, showLoading, router, initialized])
 
   const handlePick = (side: "left" | "right") => {
     if (animating) return
@@ -70,6 +78,10 @@ export default function ThisOrThat() {
         indicator="dots"
       />
     )
+  }
+
+  if (!hydrated || !initialized) {
+    return <div style={{ background: "var(--surface)", height: "100dvh" }} />
   }
 
   if (candidates.length < 2) {

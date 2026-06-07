@@ -25,7 +25,7 @@ A progressive web app that eliminates the "saan tayo kakain" group chat debate. 
 | Language | TypeScript |
 | Styling | Tailwind CSS + CSS custom properties |
 | State | Zustand with persist middleware |
-| Animations | Framer Motion, Lottie |
+| Animations | Framer Motion, Lottie, canvas-confetti |
 | Places data | Google Places API (New) — `searchNearby` + `searchText` |
 | Rate limiting | Upstash Redis |
 | Testing | Playwright E2E |
@@ -63,6 +63,8 @@ The API key is server-side only. The client never touches Google's API directly.
 - **Client-side filters** — open now, price level cap, permanently closed exclusion applied after fetch
 - **Hydration guard** — custom `useHydrated` hook with lazy `useState` initializer prevents Zustand persist middleware from firing redirect guards on empty initial state
 - **Redirect guards** — every game screen has a `useEffect` guard that redirects if state is missing or mode is already used, preventing back-button abuse
+- **Custom SVG spin wheel** — built from scratch with `requestAnimationFrame`, zero React re-renders per frame (direct DOM mutation via ref). Idle rotation runs on mount so users can read all choices. Spin uses a corrected landing formula: `X = -(i×sliceDeg + sliceDeg/2)` so the slice center lands exactly at 12 o'clock. Winner slice is highlighted gold on stop for zero visual ambiguity. `canvas-confetti` burst on reveal.
+- **Mobile & IAB compatibility** — `vw`-only sizing (no `cqw`) for Safari iOS 14+ and in-app browsers; `env(safe-area-inset-top)` for notched devices; `OpenInBrowserBanner` detects Facebook/Instagram/TikTok IABs and prompts to open in Safari or Chrome
 - **PWA** — installable, offline fallback page, service worker via `next-pwa`
 
 ---

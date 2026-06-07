@@ -52,6 +52,7 @@ export default function ThisOrThat() {
       setAnimating(false)
 
       if (newRemaining.length === 0) {
+        if (!winner) return
         setWinner(winner)
         setShowLoading(true)
         setTimeout(() => {

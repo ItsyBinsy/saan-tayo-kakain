@@ -179,6 +179,16 @@ body {
   50% { opacity: 0.2; }
 }
 
+@keyframes splash-tap-pulse {
+  0%, 100% { opacity: 0.5; transform: translateY(0); }
+  50%       { opacity: 0.2; transform: translateY(-4px); }
+}
+
+@keyframes stk-pulse {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(196,30,58,0.45)) drop-shadow(0 8px 32px rgba(14,10,4,0.55)); }
+  50%       { filter: drop-shadow(0 0 28px rgba(196,30,58,0.8))  drop-shadow(0 8px 32px rgba(14,10,4,0.55)); }
+}
+
 .meal-icon {
   width: clamp(48px, 22cqw, 80px);
   height: clamp(48px, 22cqw, 80px);

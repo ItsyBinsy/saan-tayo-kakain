@@ -102,10 +102,7 @@ export default function Home() {
           from { opacity: 0; transform: translateY(24px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes splash-tap-pulse {
-          0%, 100% { opacity: 0.5; transform: translateY(0); }
-          50%       { opacity: 0.2; transform: translateY(-4px); }
-        }
+
       `}</style>
     </main>
   )

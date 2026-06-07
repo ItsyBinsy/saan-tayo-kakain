@@ -1,30 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/store"
 import { useHydrated } from "@/hooks/useHydrated"
-import dynamic from "next/dynamic"
+import SpinWheel from "@/components/SpinWheel"
 import LoadingScreen from "@/components/LoadingScreen"
 import afterPaikutinAnim from "@/animations/after-paikutin.json"
 import { motion, AnimatePresence } from "framer-motion"
-
-const Wheel = dynamic(
-  () => import("react-custom-roulette").then(m => m.Wheel),
-  {
-    ssr: false,
-    loading: () => (
-      <div style={{
-        width: "300px",
-        height: "300px",
-        borderRadius: "50%",
-        background: "conic-gradient(#C41E3A 0deg 60deg, #1A1208 60deg 120deg, #A01830 120deg 180deg, #2A1F10 180deg 240deg, #C41E3A 240deg 300deg, #1A1208 300deg 360deg)",
-        opacity: 0.4,
-        animation: "pulse 1.5s ease-in-out infinite",
-      }} />
-    ),
-  }
-)
+import confetti from "canvas-confetti"
 
 export default function Paikutin() {
   const router = useRouter()
@@ -32,15 +16,15 @@ export default function Paikutin() {
   const usedModes = useStore((state) => state.usedModes)
   const setWinner = useStore((state) => state.setWinner)
   const addUsedMode = useStore((state) => state.addUsedMode)
-
   const hydrated = useHydrated()
 
   const [spinning, setSpinning] = useState(false)
-  const [prizeNumber, setPrizeNumber] = useState(0)
+  const [targetIndex, setTargetIndex] = useState(0)
   const [showLoading, setShowLoading] = useState(false)
   const [hasSpun, setHasSpun] = useState(false)
-  const [stopping, setStopping] = useState(false)
   const [winnerName, setWinnerName] = useState<string | null>(null)
+  const [revealed, setRevealed] = useState(false)
+  const spinLock = useRef(false)
 
   useEffect(() => {
     if (!hydrated) return
@@ -48,45 +32,55 @@ export default function Paikutin() {
     else if (!showLoading && usedModes.includes("paikutin")) router.replace("/winner")
   }, [hydrated, places, usedModes, showLoading, router])
 
-  const truncate = (text: string, max: number) =>
-    text.length > max ? text.slice(0, max - 1) + "…" : text
+  const fireConfetti = useCallback(() => {
+    const opts = {
+      particleCount: 60,
+      spread: 70,
+      colors: ["#C41E3A", "#E8820C", "#D4A017", "#C4780A", "#FDF6E3", "#A63220"],
+      startVelocity: 28,
+      gravity: 1.1,
+      scalar: 0.9,
+    }
+    confetti({ ...opts, origin: { x: 0.35, y: 0.55 } })
+    confetti({ ...opts, origin: { x: 0.65, y: 0.55 } })
+  }, [])
 
-  const data = places.map((place) => ({
-    option: truncate(place.displayName.text, 14),
-  }))
-
-  const spinWheel = () => {
-    if (spinning || stopping) return
-    const winner = Math.floor(Math.random() * places.length)
-    setPrizeNumber(winner)
+  const spinWheel = useCallback(() => {
+    if (spinning || spinLock.current || revealed) return
+    spinLock.current = true
+    const idx = Math.floor(Math.random() * places.length)
+    setTargetIndex(idx)
     setSpinning(true)
     setHasSpun(true)
     setWinnerName(null)
-  }
+  }, [spinning, revealed, places.length])
 
-  const handleStop = () => {
-    // Delay state updates one frame to let the wheel finish its final render
-    requestAnimationFrame(() => {
-      setSpinning(false)
-      setStopping(true)
-      setWinnerName(places[prizeNumber].displayName.text)
-      setWinner(places[prizeNumber])
+  const handleStop = useCallback(() => {
+    setSpinning(false)
+    spinLock.current = false
 
+    const winner = places[targetIndex]
+    setWinnerName(winner.displayName.text)
+    setWinner(winner)
+    setRevealed(true)
+
+    // Haptic feedback
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      navigator.vibrate([60, 40, 100])
+    }
+
+    // Confetti burst
+    fireConfetti()
+
+    // Navigate after a short celebration pause
+    setTimeout(() => {
+      setShowLoading(true)
       setTimeout(() => {
-        setShowLoading(true)
-        setTimeout(() => {
-          addUsedMode("paikutin")
-          const tryNavigate = () => {
-            router.push("/winner")
-            setTimeout(() => {
-              if (!window.location.pathname.includes("winner")) router.push("/winner")
-            }, 2000)
-          }
-          tryNavigate()
-        }, 4000)
-      }, 1800)
-    })
-  }
+        addUsedMode("paikutin")
+        router.push("/winner")
+      }, 4000)
+    }, 1600)
+  }, [places, targetIndex, setWinner, addUsedMode, router, fireConfetti])
 
   if (showLoading) {
     return (
@@ -99,34 +93,32 @@ export default function Paikutin() {
     )
   }
 
-  if (places.length === 0) {
-    return (
-      <main
-        className="flex flex-col items-center justify-center"
-        style={{ background: "var(--surface-dark)", height: "100dvh" }}
-      >
-        <p style={{ color: "var(--text-muted)", fontFamily: "var(--font-body)", fontSize: "14px" }}>
-          No places found. Go back and search again.
-        </p>
-      </main>
-    )
+  if (!hydrated || places.length === 0) {
+    return <div style={{ background: "var(--surface)", height: "100dvh" }} />
   }
+
+  const slices = places.map((p) => ({ label: p.displayName.text }))
 
   return (
     <main
-      className="flex flex-col items-center"
+      className="flex flex-col"
       style={{
         background: "var(--surface)",
         height: "100dvh",
-        overflow: "hidden",
-        paddingTop: "calc(env(safe-area-inset-top) + 32px)",
-        paddingBottom: "env(safe-area-inset-bottom)",
+        overflow: "hidden",  // clips the bottom half of the oversized wheel
         position: "relative",
+        cursor: spinning || revealed ? "default" : "pointer",
       }}
       onClick={spinWheel}
     >
-      {/* Title */}
-      <div className="w-full px-5 mb-4" style={{ flexShrink: 0 }}>
+      {/* Header */}
+      <div
+        className="w-full px-5"
+        style={{
+          paddingTop: "calc(env(safe-area-inset-top) + 28px)",
+          flexShrink: 0,
+        }}
+      >
         <h1
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
@@ -139,25 +131,26 @@ export default function Paikutin() {
         >
           Paikutin
         </h1>
-        {/* Fixed height container so subtitle never shifts the wheel */}
-        <div style={{ height: "36px", marginTop: "4px", overflow: "hidden" }}>
+
+        {/* Fixed height subtitle */}
+        <div style={{ height: "36px", marginTop: "6px", overflow: "hidden" }}>
           <AnimatePresence mode="wait">
             <motion.p
-              key={stopping ? "winner" : spinning ? "spinning" : "idle"}
+              key={revealed ? "winner" : spinning ? "spinning" : "idle"}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
               style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: stopping ? "clamp(20px, 5.5cqw, 26px)" : "13px",
-                color: stopping ? "var(--text-main)" : "var(--text-muted)",
+                fontSize: revealed ? "clamp(20px, 5.5cqw, 26px)" : "13px",
+                color: revealed ? "var(--brand)" : "var(--text-muted)",
                 fontWeight: 800,
-                letterSpacing: stopping ? "-0.5px" : "normal",
+                letterSpacing: revealed ? "-0.5px" : "normal",
                 lineHeight: 1.2,
               }}
             >
-              {stopping && winnerName
+              {revealed && winnerName
                 ? `It's ${winnerName}!`
                 : spinning
                 ? `${places.length} candidates · spinning...`
@@ -167,101 +160,58 @@ export default function Paikutin() {
         </div>
       </div>
 
-      {/* Wheel + pointer together */}
+      {/*
+        Wheel sits at the bottom of the flex column.
+        SpinWheel internally sizes itself to ~155vw and pulls
+        its bottom half below the viewport via negative marginBottom.
+        flex:1 pushes it down so only top ~50% shows.
+      */}
       <div
-        className="flex flex-col items-center justify-center"
         style={{
           flex: 1,
-          minHeight: 0,
-          width: "100%",
-          cursor: spinning || stopping ? "default" : "pointer",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
           overflow: "hidden",
+          width: "100%",
         }}
       >
-        {/* Pointer — sits just above the wheel, always adjacent */}
-        <motion.div
-          initial={{ y: -6, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.3 }}
-          style={{
-            width: 0,
-            height: 0,
-            borderLeft: "10px solid transparent",
-            borderRight: "10px solid transparent",
-            borderTop: "18px solid var(--brand)",
-            marginBottom: "6px",
-            flexShrink: 0,
-            filter: "drop-shadow(0 2px 4px rgba(196,30,58,0.4))",
-          }}
+        <SpinWheel
+          slices={slices}
+          spinning={spinning}
+          targetIndex={targetIndex}
+          onStop={handleStop}
         />
-        <div style={{
-          filter: "drop-shadow(0px 8px 24px rgba(26,18,8,0.22)) drop-shadow(0px 2px 6px rgba(196,30,58,0.18))",
-          borderRadius: "50%",
-        }}>
-          <Wheel
-            mustStartSpinning={spinning}
-            prizeNumber={prizeNumber}
-            data={data}
-            onStopSpinning={handleStop}
-            backgroundColors={[
-              "#C41E3A", "#1A1208", "#A01830", "#2A1F10",
-              "#C41E3A", "#1A1208", "#A01830", "#2A1F10",
-              "#C41E3A", "#1A1208",
-            ]}
-            textColors={[
-              "#F5F0E8", "#F5F0E8", "#F5F0E8", "#F5F0E8",
-              "#F5F0E8", "#F5F0E8", "#F5F0E8", "#F5F0E8",
-              "#F5F0E8", "#F5F0E8",
-            ]}
-            outerBorderColor="#1A1208"
-            outerBorderWidth={6}
-            innerRadius={10}
-            innerBorderColor="#C41E3A"
-            innerBorderWidth={6}
-            radiusLineColor="#1A1208"
-            radiusLineWidth={1}
-            fontSize={10}
-            fontWeight={700}
-            pointerProps={{ style: { display: "none" } }}
-          />
-        </div>
       </div>
 
-      {/* Safe area spacer — always present so wheel doesn't shift */}
-      <div style={{
-        flexShrink: 0,
-        height: "calc(16px + env(safe-area-inset-bottom))",
-        width: "100%",
-      }} />
-
-      {/* Pre-spin CTA hint — removed from layout after first spin */}
+      {/* Pre-spin CTA — pinned to bottom of header block, above the wheel gap */}
       <AnimatePresence>
         {!hasSpun && (
           <motion.div
-            initial={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.25 }}
             style={{
               position: "absolute",
-              bottom: "calc(16px + env(safe-area-inset-bottom))",
+              bottom: "calc(min(80vw, 360px) + 32px)",
               left: 0,
               right: 0,
-              borderTop: "2px solid var(--border)",
-              padding: "16px",
-              background: "var(--surface)",
-              textAlign: "center",
+              display: "flex",
+              justifyContent: "center",
               pointerEvents: "none",
             }}
           >
-            <p style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800,
-              fontSize: "clamp(18px, 5cqw, 22px)",
-              color: "var(--text-main)",
-              letterSpacing: "0.3px",
+            <span style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              color: "var(--text-muted)",
+              animation: "splash-tap-pulse 3s ease-in-out infinite",
             }}>
-              Tap anywhere to spin →
-            </p>
+              Tap anywhere to spin
+            </span>
           </motion.div>
         )}
       </AnimatePresence>

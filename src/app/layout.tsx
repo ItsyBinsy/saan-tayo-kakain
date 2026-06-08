@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Barlow_Condensed, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import OpenInBrowserBanner from "@/components/OpenInBrowserBanner";
+import DisablePinchZoom from "@/components/DisablePinchZoom";
 
 const barlowCondensed = Barlow_Condensed({
   subsets: ["latin"],
@@ -66,6 +67,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body suppressHydrationWarning>
+        <DisablePinchZoom />
         <OpenInBrowserBanner />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-42N9LG081H" strategy="lazyOnload" />
         <Script id="google-analytics" strategy="lazyOnload">

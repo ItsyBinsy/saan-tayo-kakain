@@ -54,7 +54,9 @@ test.describe("This or That", () => {
     for (let round = 1; round <= 4; round++) {
       if (page.url().includes("/winner")) break
       await expect(page.getByText(new RegExp(`Round ${round} of`))).toBeVisible()
-      await page.locator("button").first().click()
+      const optionA = page.getByText("Option A")
+      await optionA.waitFor({ state: "visible", timeout: 3000 })
+      await optionA.click()
       await page.waitForTimeout(500)
     }
 

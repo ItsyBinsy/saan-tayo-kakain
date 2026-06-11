@@ -66,7 +66,9 @@ test.describe("Navigation abuse / cheat prevention", () => {
     await goToMode("this-or-that")
     for (let i = 0; i < 4; i++) {
       if (page.url().includes("/winner")) break
-      await page.locator("button").first().click()
+      const optionA = page.getByText("Option A")
+      await optionA.waitFor({ state: "visible", timeout: 3000 })
+      await optionA.click()
       await page.waitForTimeout(500)
     }
     await page.waitForURL("**/winner", { timeout: 20000 })

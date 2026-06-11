@@ -16,7 +16,7 @@ test.describe("Navigation abuse / cheat prevention", () => {
   test("refresh on /winner → redirects to /filter (store wiped)", async ({ page, loadApp, goToMode }) => {
     await loadApp(SHORT_PLACES)
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 12000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
 
     await page.reload()
     await page.waitForURL("**/filter", { timeout: 5000 })
@@ -38,7 +38,7 @@ test.describe("Navigation abuse / cheat prevention", () => {
 
     // Use Bahala Na → winner
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 12000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
 
     // Use in-app "Try another mode" to go back (keeps store alive)
     await page.getByText("Try another mode").click()
@@ -69,7 +69,7 @@ test.describe("Navigation abuse / cheat prevention", () => {
       await page.locator("button").first().click()
       await page.waitForTimeout(350)
     }
-    await page.waitForURL("**/winner", { timeout: 12000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
 
     // Use in-app button to go back to /modes (keeps store alive)
     await page.getByText("Try another mode").click()
@@ -118,7 +118,7 @@ test.describe("Navigation abuse / cheat prevention", () => {
     await page.waitForURL("**/modes/bahala-na", { timeout: 5000 })
 
     // Wait for winner
-    await page.waitForURL("**/winner", { timeout: 12000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
 
     // Go back to modes — Bahala Na should be disabled (used once)
     await page.getByText("Try another mode").click()

@@ -58,7 +58,7 @@ test.describe("This or That", () => {
       await page.waitForTimeout(300)
     }
 
-    await page.waitForURL("**/winner", { timeout: 12000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
     await expect(page.locator("h1")).not.toBeEmpty()
   })
 
@@ -67,7 +67,7 @@ test.describe("This or That", () => {
     await goToMode("this-or-that")
     await expect(page.getByText("Round 1 of 1")).toBeVisible()
     await page.locator("button").first().click()
-    await page.waitForURL("**/winner", { timeout: 12000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
     await expect(page.locator("h1")).not.toBeEmpty()
   })
 

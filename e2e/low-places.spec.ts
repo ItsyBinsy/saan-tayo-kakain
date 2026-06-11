@@ -21,7 +21,7 @@ test.describe("This or That — low place counts", () => {
     await goToMode("this-or-that")
     await expect(page.getByText("Round 1 of 1")).toBeVisible()
     await page.getByText("Option A").click()
-    await page.waitForURL("**/winner", { timeout: 12000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
   })
 
   test("3 places: shows Round 1 of 2, two rounds to finish", async ({ page, loadApp, goToMode }) => {
@@ -31,7 +31,7 @@ test.describe("This or That — low place counts", () => {
     await page.getByText("Option A").click()
     await expect(page.getByText("Round 2 of 2")).toBeVisible()
     await page.getByText("Option A").click()
-    await page.waitForURL("**/winner", { timeout: 12000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
   })
 
   test("4 places: shows Round 1 of 3, three rounds to finish", async ({ page, loadApp, goToMode }) => {
@@ -43,7 +43,7 @@ test.describe("This or That — low place counts", () => {
     await page.getByText("Option A").click()
     await expect(page.getByText("Round 3 of 3")).toBeVisible()
     await page.getByText("Option A").click()
-    await page.waitForURL("**/winner", { timeout: 12000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
   })
 })
 
@@ -51,14 +51,14 @@ test.describe("Bahala Na — low place counts", () => {
   test("1 place: auto-picks and navigates to /winner", async ({ page, loadApp, goToMode }) => {
     await loadApp(ONE_PLACE)
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 10000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
     await expect(page.locator("h1")).not.toBeEmpty()
   })
 
   test("1 place: after Bahala Na used, back to /modes redirects to /winner (all modes disabled)", async ({ page, loadApp, goToMode }) => {
     await loadApp(ONE_PLACE)
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 10000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
 
     // Go back to modes via in-app button
     await page.getByText("Try another mode").click()

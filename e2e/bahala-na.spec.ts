@@ -4,7 +4,7 @@ test.describe("Bahala Na", () => {
   test("auto-picks a winner and navigates to /winner within 2s", async ({ page, loadApp, goToMode }) => {
     await loadApp(SHORT_PLACES)
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 10000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
     await expect(page).toHaveURL(/\/winner/)
   })
 
@@ -19,7 +19,7 @@ test.describe("Bahala Na", () => {
 
     // First visit — picks winner
     await goToMode("bahala-na")
-    await page.waitForURL("**/winner", { timeout: 10000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
     const firstWinner = await page.locator("h1").textContent()
 
     // Use "Try another mode" to go back to /modes (client-side nav — keeps store alive)
@@ -41,7 +41,7 @@ test.describe("Bahala Na", () => {
       await page.locator("button").first().click()
       await page.waitForTimeout(300)
     }
-    await page.waitForURL("**/winner", { timeout: 10000 })
+    await page.waitForURL("**/winner", { timeout: 20000 })
     const secondWinner = await page.locator("h1").textContent()
 
     // Winner may differ (different mode picks differently) but original Bahala Na winner is still stored

@@ -67,7 +67,7 @@ test.describe("Navigation abuse / cheat prevention", () => {
     for (let i = 0; i < 4; i++) {
       if (page.url().includes("/winner")) break
       await page.locator("button").first().click()
-      await page.waitForTimeout(350)
+      await page.waitForTimeout(500)
     }
     await page.waitForURL("**/winner", { timeout: 20000 })
 

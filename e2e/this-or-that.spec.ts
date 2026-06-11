@@ -55,7 +55,7 @@ test.describe("This or That", () => {
       if (page.url().includes("/winner")) break
       await expect(page.getByText(new RegExp(`Round ${round} of`))).toBeVisible()
       await page.locator("button").first().click()
-      await page.waitForTimeout(300)
+      await page.waitForTimeout(500)
     }
 
     await page.waitForURL("**/winner", { timeout: 20000 })

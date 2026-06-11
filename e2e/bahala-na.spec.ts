@@ -39,7 +39,7 @@ test.describe("Bahala Na", () => {
     for (let i = 0; i < 4; i++) {
       if (page.url().includes("/winner")) break
       await page.locator("button").first().click()
-      await page.waitForTimeout(300)
+      await page.waitForTimeout(500)
     }
     await page.waitForURL("**/winner", { timeout: 20000 })
     const secondWinner = await page.locator("h1").textContent()

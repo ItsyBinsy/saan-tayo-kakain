@@ -60,12 +60,8 @@ test.describe("Bahala Na — low place counts", () => {
     await goToMode("bahala-na")
     await page.waitForURL("**/winner", { timeout: 20000 })
 
-    // Go back to modes via in-app button
-    await page.getByText("Try another mode").click()
-    await page.getByText("Sure? Tap again").click()
-
-    // Should redirect straight to /winner — all modes are disabled
-    await page.waitForURL("**/winner", { timeout: 5000 })
-    await expect(page).toHaveURL(/\/winner/)
+    // All modes used with 1 place — only "Start over" is shown (no "Try another mode")
+    await expect(page.getByText("You've used all modes.")).toBeVisible()
+    await expect(page.getByText("Try another mode")).not.toBeVisible()
   })
 })

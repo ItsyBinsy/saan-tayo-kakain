@@ -131,6 +131,9 @@ export async function POST(req: NextRequest) {
     if (!category || !CATEGORY_TYPES[category]) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 })
     }
+    if (typeof radius === "number" && (radius < 100 || radius > 2000)) {
+      return NextResponse.json({ error: "Invalid radius" }, { status: 400 })
+    }
   } else {
     if (typeof textQuery !== "string" || textQuery.trim().length === 0 || textQuery.length > 200) {
       return NextResponse.json({ error: "Invalid query" }, { status: 400 })

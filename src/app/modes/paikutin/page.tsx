@@ -127,7 +127,7 @@ export default function Paikutin() {
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
-            fontSize: "clamp(40px, 12cqw, 64px)",
+            fontSize: "clamp(56px, 18cqw, 88px)",
             color: "var(--text-main)",
             letterSpacing: "-1.5px",
             lineHeight: "0.88",
@@ -137,7 +137,7 @@ export default function Paikutin() {
         </h1>
 
         {/* Fixed height subtitle */}
-        <div style={{ height: "36px", marginTop: "6px", overflow: "hidden" }}>
+        <div style={{ height: "36px", marginTop: "8px", overflow: "hidden" }}>
           <AnimatePresence mode="wait">
             <motion.p
               key={revealed ? "winner" : spinning ? "spinning" : "idle"}
@@ -146,11 +146,12 @@ export default function Paikutin() {
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
               style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: revealed ? "clamp(20px, 5.5cqw, 26px)" : "13px",
+                fontFamily: revealed ? "'Barlow Condensed', sans-serif" : "var(--font-body)",
+                fontSize: revealed ? "clamp(20px, 5.5cqw, 26px)" : "11px",
                 color: revealed ? "var(--brand)" : "var(--text-muted)",
                 fontWeight: 800,
-                letterSpacing: revealed ? "-0.5px" : "normal",
+                letterSpacing: revealed ? "-0.5px" : "0.12em",
+                textTransform: revealed ? "none" : "uppercase",
                 lineHeight: 1.2,
               }}
             >

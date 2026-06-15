@@ -92,8 +92,8 @@ const CACHE_TTL_S = 900 // 15 minutes
 function buildCacheKey(body: Record<string, unknown>): string {
   if (typeof body.latitude === "number" && typeof body.longitude === "number") {
     // Round to ~100m grid so nearby users share the same cache bucket
-    const lat = Math.round(body.latitude * 1000) / 1000
-    const lng = Math.round(body.longitude * 1000) / 1000
+    const lat = Math.round(body.latitude * 100) / 100
+    const lng = Math.round(body.longitude * 100) / 100
     const radius = typeof body.radius === "number" ? body.radius : 500
     return `places:${lat}:${lng}:${body.category}:${radius}`
   }

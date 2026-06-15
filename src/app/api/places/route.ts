@@ -87,6 +87,18 @@ const ALLOWED_TEXT_CATEGORIES = new Set([
 
 const WINDOW_S = 60
 const MAX_REQUESTS = 5
+const CACHE_TTL_S = 900 // 15 minutes
+
+function buildCacheKey(body: Record<string, unknown>): string {
+  if (typeof body.latitude === "number" && typeof body.longitude === "number") {
+    // Round to ~100m grid so nearby users share the same cache bucket
+    const lat = Math.round(body.latitude * 1000) / 1000
+    const lng = Math.round(body.longitude * 1000) / 1000
+    const radius = typeof body.radius === "number" ? body.radius : 500
+    return `places:${lat}:${lng}:${body.category}:${radius}`
+  }
+  return `places:text:${body.textQuery}`
+}
 
 async function isRateLimited(ip: string): Promise<boolean> {
   const key = `rl:${ip}`
@@ -127,6 +139,12 @@ export async function POST(req: NextRequest) {
     if (!isAllowed) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 })
     }
+  }
+
+  const cacheKey = buildCacheKey({ category, textQuery, latitude, longitude, radius })
+  const cached = await redis.get<string>(cacheKey)
+  if (cached) {
+    return NextResponse.json(cached)
   }
 
   const controller = new AbortController()
@@ -183,7 +201,9 @@ export async function POST(req: NextRequest) {
     const data = await response.json()
     const resolvedCategory = resolveCategory(category, textQuery)
     const places = reclassifyPlaces(data.places ?? [], resolvedCategory).slice(0, MAX_PLACES)
-    return NextResponse.json({ ...data, places })
+    const result = { ...data, places }
+    await redis.set(cacheKey, result, { ex: CACHE_TTL_S })
+    return NextResponse.json(result)
   } catch {
     return NextResponse.json({ error: "Request timed out or failed" }, { status: 504 })
   } finally {

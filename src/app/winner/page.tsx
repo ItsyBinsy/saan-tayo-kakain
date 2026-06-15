@@ -180,7 +180,7 @@ export default function Winner() {
         <div
           className="flex flex-col justify-end px-5 pb-6"
           style={{
-            background: "var(--surface-dark)",
+            background: "linear-gradient(160deg, #2C1F0E 0%, #1A1208 100%)",
             minHeight: "44dvh",
             flexShrink: 0,
             paddingTop: "calc(32px + env(safe-area-inset-top))",

@@ -41,13 +41,12 @@ export default function Modes() {
       <main
         className="flex flex-col"
         style={{
-          background: "var(--surface-dark)",
           height: "100dvh",
           overflow: "hidden"
         }}
     >
       {/* Context — top */}
-      <div className="modes-hero flex flex-col justify-end pb-6" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+      <div className="modes-hero flex flex-col justify-end pb-6" style={{ paddingTop: "env(safe-area-inset-top)", background: "linear-gradient(160deg, #2C1F0E 0%, #1A1208 100%)" }}>
         <p
           className="uppercase tracking-widest mb-2 px-5"
           style={{

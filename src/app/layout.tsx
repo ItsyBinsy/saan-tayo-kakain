@@ -22,7 +22,13 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Saan Tayo Kakain",
   description: "Tabi. Ako na pipili. No more arguments about where to eat.",
-  keywords: ["saan kakain", "food decider", "restaurant picker", "where to eat", "food app philippines", "where to eat manila", "bahala na", "paikutin", "this or that", "group food decision"],
+  keywords: [
+    "saan tayo kakain", "saan kakain", "anong kainin natin", "saan mangangain",
+    "where to eat philippines", "where should we eat", "what to eat",
+    "random restaurant picker", "restaurant roulette", "food decision maker",
+    "spin the wheel restaurant", "food finder philippines",
+    "bahala na pagkain", "pagkain near me", "restaurant picker philippines",
+  ],
   authors: [{ name: "Vince Carl Viaña" }],
   openGraph: {
     title: "Saan Tayo Kakain",
